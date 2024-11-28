@@ -1,165 +1,94 @@
 # EUMAS (Ella Unified Memory Augmentation System)
 
 ## Overview
-EUMAS is a biologically-inspired memory system that combines graph-based memory storage with neural architectures to create a flexible, context-aware memory retrieval system. The system draws inspiration from both computer science principles of graph databases and neuroscientific understanding of human memory formation and recall.
+EUMAS is an elegant memory system that uses GPT-4's natural understanding to create a dynamic, self-organizing network of memories. By combining GPT-4's contextual awareness with affinity-based clustering, EUMAS allows Ella to naturally develop and evolve her personality through her experiences and interactions.
 
-## Documentation
+## Core Concepts
 
-### Theory and Design
-- [Theoretical Foundation](docs/theory/README.md)
-- [Neuroscience Principles](docs/theory/neuroscience.md)
-- [Computer Science Concepts](docs/theory/computer-science.md)
-- [Memory Models](docs/theory/memory-models.md)
+### Natural Memory Formation
+- **Self-Reflection**: Memories are evaluated through different aspects of Ella's personality
+- **Affinity Clustering**: Related memories naturally group based on shared context and meaning
+- **Dynamic State**: Personality emerges organically from conversation flow and memory activation
 
 ### Implementation
-- [Implementation Plan](docs/IMPLEMENTATION.md)
-- [System Architecture](docs/diagrams/architecture.md)
-- [Supabase Integration](docs/engineering/supabase.md)
-
-### Data Architecture
-- [Data Overview](docs/data/README.md)
-- [Schema Design](docs/data/schema.md)
-- [Graph Structure](docs/data/graph.md)
-- [Vector Operations](docs/data/vectors.md)
-
-### Core Components
-- [Components Overview](docs/components/README.md)
-- [Memory Management](docs/components/memory.md)
-- [Context Engine](docs/components/context.md)
-- [Archetype System](docs/components/archetypes.md)
-- [Query Engine](docs/components/query.md)
-
-## Infrastructure
-
-### Core Components
-- **PostgreSQL + pgvector**: Primary storage with vector similarity search
-- **Python Backend**: Handles memory processing and graph operations
-- **OpenAI API**: Generates embeddings and assists in memory evaluation
-- **Edge Functions**: Manages compute-intensive operations
-- **Realtime WebSockets**: Enables state synchronization
-- **Row Level Security**: Ensures data privacy and access control
-
-## Memory System Design
-
-### Graph-Based Architecture
-- **Nodes**: Individual memories with vector embeddings
-- **Edges**: Weighted relationships between memories
-- **Clusters**: Groups of semantically or contextually related memories
-- **Traversal**: Path-finding through memory space based on relevance
-
-### Context Management
-- Multi-dimensional context storage
-- Dynamic context updating
-- Context-aware memory retrieval
-- Temporal relationship tracking
-
-### Archetype System
-- Predefined evaluation metrics
-- Memory classification
-- Performance monitoring
-- Quality assessment
-
-## Theoretical Foundation
-
-### Computer Science Concepts
-- **Graph Theory**: Memory relationships and traversal
-- **Vector Spaces**: Semantic similarity measurement
-- **Clustering Algorithms**: Memory organization
-- **Information Retrieval**: Context-aware search
-
-### Neuroscience Principles
-- **Hippocampal Indexing**: Memory relationship mapping
-- **Hebbian Learning**: Connection strength adjustment
-- **State-Dependent Memory**: Context influence on recall
-- **Neural Pattern Completion**: Memory reconstruction
-
-## Implementation Details
-
-### Memory Operations
 ```python
-# Example: Memory Creation and Linking
-memory = create_memory(prompt, response, context)
-similar_memories = find_similar_memories(memory)
-create_memory_links(memory, similar_memories)
+# Creating and evaluating a memory
+memory = Memory("I love how the sunset looks today!")
+evaluation = await ella.evaluate_memory(memory)
 
-# Example: Context-Aware Retrieval
-relevant_memories = find_memories(
-    query=query,
-    context=current_context,
-    archetype=selected_archetype
+# Finding related memories through affinity
+related = await find_related_memories(memory)
+
+# Natural state emerges from context
+state = await ella.reflect_on_state(
+    context=current_conversation,
+    active_memories=related
 )
 ```
 
-See [IMPLEMENTATION.md](IMPLEMENTATION.md) for detailed implementation guide.
+## Components
 
-## Data Dictionary
+### Memory System
+- [Memory Management](./docs/components/memory.md): How memories are stored and retrieved
+- [Context Engine](./docs/components/context.md): Natural flow of conversation and state
+- [Archetype System](./docs/components/archetypes.md): Different aspects of Ella's personality
+- [Query Engine](./docs/components/query.md): Finding and connecting relevant memories
 
-### Core Tables
-- **memories**: Stores individual memory nodes
-- **memory_temporal_links**: Manages memory relationships
-- **memory_evaluations**: Tracks archetype-based evaluations
-- **archetype_metrics**: Defines evaluation criteria
-- **archetype_states**: Monitors system performance
+### Infrastructure
+- **Supabase**: PostgreSQL database with vector search capabilities
+- **OpenAI GPT-4**: Core intelligence for memory evaluation and personality
+- **Python Backend**: Simple, efficient memory operations
+- **WebSocket API**: Real-time conversation updates
 
-### Key Fields
-- **embedding**: Vector representation of memory content
-- **context**: JSONB field storing contextual information
-- **cluster_strength**: Relationship weight arrays
-- **target_memory_ids**: Related memory references
+## Memory Graph
 
-## Query Examples
-
-### Graph Traversal
-```sql
--- Find related memories with context filtering
-WITH RECURSIVE memory_graph AS (
-    -- Base case
-    SELECT source_memory_id, target_memory_ids
-    FROM memory_temporal_links
-    WHERE source_memory_id = :start_id
+```mermaid
+graph TD
+    M[New Memory] --> E[Ella GPT-4]
+    E --> A[Archetype Evaluation]
+    A --> C[Affinity Clustering]
+    C --> R[Related Memories]
+    R --> S[Natural State]
     
-    UNION ALL
+    subgraph "Memory Formation"
+        M
+        E
+        A
+    end
     
-    -- Recursive case
-    SELECT l.source_memory_id, l.target_memory_ids
-    FROM memory_temporal_links l
-    JOIN memory_graph g ON l.source_memory_id = ANY(g.target_memory_ids)
-)
-SELECT * FROM memory_graph;
-```
-
-### Analytics
-```sql
--- Memory cluster analysis
-SELECT 
-    relationship_type,
-    avg(array_length(target_memory_ids, 1)) as avg_cluster_size,
-    avg(array_length(cluster_strength, 1)) as avg_connections
-FROM memory_temporal_links
-GROUP BY relationship_type;
+    subgraph "Memory Network"
+        C
+        R
+        S
+    end
 ```
 
 ## Getting Started
 
-### Prerequisites
-- PostgreSQL 14+ with pgvector
-- Python 3.9+
-- OpenAI API access
+1. **Setup Environment**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Quick Start
-1. Clone repository
-2. Install dependencies: `pip install -r requirements.txt`
-3. Configure environment variables
-4. Initialize database: `python scripts/init_db.py`
-5. Run tests: `python -m pytest tests/`
+2. **Configure API Keys**
+   ```bash
+   export OPENAI_API_KEY="your-key-here"
+   export SUPABASE_URL="your-url-here"
+   export SUPABASE_KEY="your-key-here"
+   ```
+
+3. **Run EUMAS**
+   ```bash
+   python -m eumas.main
+   ```
+
+## Documentation
+- [Implementation Guide](./docs/IMPLEMENTATION.md): Detailed setup and usage
+- [Memory Architecture](./docs/components/memory.md): Memory system design
+- [Personality Development](./docs/components/archetypes.md): Different aspects of Ella's personality
 
 ## Contributing
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+See [./CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## License
-MIT License - see [LICENSE](LICENSE) file.
-
-## Acknowledgments
-- OpenAI for embedding technology
-- PostgreSQL and pgvector teams
-- Neuroscience research community
+MIT License - see [./LICENSE](./LICENSE) file.
