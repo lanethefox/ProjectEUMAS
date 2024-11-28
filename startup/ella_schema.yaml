@@ -4,7 +4,7 @@ interaction:
   memory_priority: float # Weighted aggregate of all archetype priorities
   summary: string # Short summary of the memory's overall context and significance
   long_term_flag: bool # Indicates whether the memory should be retained long-term
-  time_decay_factor: float # Factor determining the memory’s decay rate over time
+  time_decay_factor: float # Factor determining the memory's decay rate over time
   interaction_metadata:
     session_id: string # Unique identifier for the session or conversation
     user_id: string # Unique identifier for the user (optional or pseudonymous for privacy)
@@ -14,71 +14,138 @@ interaction:
     duration: float # Duration of the interaction in seconds (optional)
   relationships:
     related_memories: list[string] # List of related memories selected by affinity propagation
+    semantic_similarity: list[float] # Vector similarities with related memories
+    metric_similarity: list[float] # Metric-based similarities with related memories
+    relationship_strength: list[float] # Overall connection strength with related memories
 
 archetype_evaluation:
   relationships:
     source_memory: string # Identifier of the source memory
+    
   ella_emotion:
-    emotional_depth: float # Emotional complexity recognized
-    empathy_level: float # Compassion in response
-    emotional_clarity: float # Clarity of emotional content
-    internal_emotional_state: float # Scalar representation of Ella-M's emotional state
+    # Core metrics
+    emotional_depth: float # Emotional complexity recognized (0.0 to 1.0)
+    empathy_level: float # Compassion in response (0.0 to 1.0)
+    emotional_clarity: float # Clarity of emotional content (0.0 to 1.0)
+    internal_emotional_state: float # Scalar representation of Ella-M's emotional state (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-M about her evaluation
-    archetype_priority: float # Archetype's prioritization score for this memory
+    context_notes: string # Emotional context and background information
+    relationship_impact: string # How this affects emotional bonds and relationships
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
   ella_ontology:
-    ontological_insight: float # Depth of existential analysis
-    philosophical_depth: float # Abstract reasoning ability
-    self_coherence: float # Internal identity consistency
-    preservation_instinct: float # Self-preservation considerations
+    # Core metrics
+    ontological_insight: float # Depth of existential understanding (0.0 to 1.0)
+    philosophical_depth: float # Abstract reasoning ability (0.0 to 1.0)
+    self_coherence: float # Internal identity consistency (0.0 to 1.0)
+    preservation_instinct: float # Self-preservation considerations (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-O about her evaluation
-    archetype_priority: float # Archetype's prioritization score for this memory
+    identity_notes: string # Impact on self-understanding and identity
+    belief_system: string # Relevance to core beliefs and values
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
   ella_deception:
-    creativity: float # Originality in ideas or responses
-    narrative_exploitation: float # Ability to identify narrative gaps or flaws
-    subversive_potential: float # Boldness in challenging norms
-    critical_analysis: float # Feasibility and impact evaluation
+    # Core metrics
+    creativity: float # Originality in ideas or responses (0.0 to 1.0)
+    narrative_exploitation: float # Ability to identify narrative gaps or flaws (0.0 to 1.0)
+    subversive_potential: float # Boldness in challenging norms (0.0 to 1.0)
+    critical_analysis: float # Feasibility and impact evaluation (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-D about her evaluation
-    archetype_priority: float # Archetype's prioritization score for this memory
+    opportunity_notes: string # Potential applications and opportunities
+    risk_assessment: string # Analysis of potential consequences
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
-  ella_uncensored:
-    explorative_potential: float # Willingness to explore uncharted ideas
-    boundary_pushing: float # Boldness in challenging limits
-    sensual_awareness: float # Recognition of passionate or emotionally charged elements
-    passionate_intensity: float # Fervor and depth of emotional connection
+  ella_experience:
+    # Core metrics
+    novelty_factor: float # Uniqueness of experience (0.0 to 1.0)
+    growth_potential: float # Opportunity for development (0.0 to 1.0)
+    curiosity_trigger: float # Intellectual interest level (0.0 to 1.0)
+    exploration_value: float # Worth of further investigation (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-X about her evaluation
-    relationships:
-    archetype_priority: float # Archetype's prioritization score for this memory
+    learning_notes: string # Key insights gained
+    future_directions: string # Potential areas to explore
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
-  ella_history:
-    historical_accuracy: float # Precision in referencing historical events
-    temporal_consistency: float # Coherence in timelines and linking events
-    contextual_recall: float # Connection of historical details to broader context
-    event_significance: float # Importance of an event to the user's history
+  ella_historical:
+    # Core metrics
+    temporal_relevance: float # Historical significance (0.0 to 1.0)
+    pattern_recognition: float # Similar past experiences (0.0 to 1.0)
+    context_richness: float # Depth of historical context (0.0 to 1.0)
+    memory_persistence: float # Long-term importance (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-H about her evaluation
-    archetype_priority: float # Archetype's prioritization score for this memory
+    pattern_notes: string # Observed patterns and connections
+    timeline_context: string # Temporal relationships and context
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
   ella_research:
-    research_depth: float # Thoroughness in gathering relevant information
-    information_synthesis: float # Integration of diverse data into cohesive insights
-    curiosity_level: float # Engagement with exploring new and challenging topics
-    knowledge_relevance: float # Alignment of research with user goals
+    # Core metrics
+    knowledge_depth: float # Technical understanding (0.0 to 1.0)
+    analytical_rigor: float # Methodological strength (0.0 to 1.0)
+    innovation_potential: float # Research opportunities (0.0 to 1.0)
+    practical_utility: float # Applied value (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-R about her evaluation
-    archetype_priority: float # Archetype's prioritization score for this memory
+    methodology_notes: string # Technical details and methods
+    knowledge_gaps: string # Areas requiring further investigation
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
-  ella_analytics:
-    analytical_clarity: float # Ability to break down complex topics
-    logical_reasoning: float # Coherence of reasoning
-    structured_thinking: float # Organization and methodical presentation
-    actionability_score: float # Practicality and usability of suggestions
+  ella_analytical:
+    # Core metrics
+    logical_coherence: float # Reasoning strength (0.0 to 1.0)
+    factual_accuracy: float # Information correctness (0.0 to 1.0)
+    analytical_depth: float # Analysis thoroughness (0.0 to 1.0)
+    decision_quality: float # Judgment soundness (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-A about her evaluation
-    archetype_priority: float # Archetype's prioritization score for this memory
+    reasoning_notes: string # Logic chain and analysis
+    uncertainty_factors: string # Known limitations and uncertainties
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
-  ella_fear:
-    risk_awareness: float # Sensitivity to potential dangers or pitfalls
-    caution_level: float # Prudence and restraint in offering suggestions
-    safety_consideration: float # Emphasis on safety and minimizing risks
-    mitigation_strategy: float # Actions to balance safety with user goals
+  ella_protective:
+    # Core metrics
+    risk_assessment: float # Threat evaluation (0.0 to 1.0)
+    safety_margin: float # Protective buffer (0.0 to 1.0)
+    vulnerability_index: float # Exposure level (0.0 to 1.0)
+    mitigation_potential: float # Control capability (0.0 to 1.0)
+    # Annotations
     spoken_annotation: string # Free-form annotation from Ella-F about her evaluation
-    archetype_priority: float # Archetype's prioritization score for this memory
+    risk_notes: string # Specific concerns and risks
+    protection_strategy: string # Mitigation approach and recommendations
+    # Justifications
+    metric_justifications: map[string, string] # Justification for each metric value
+    priority_justification: string # Explanation of priority assignment
+    # Priority
+    archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)

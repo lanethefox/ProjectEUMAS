@@ -38,6 +38,38 @@ graph TD
 
 ## Memory Evaluation Structure
 
+### Prompt Structure
+```typescript
+interface MemoryPrompt {
+    // Raw content
+    content: string;
+    
+    // Current context
+    context: {
+        user_state: string;
+        conversation_history: string[];
+        relevant_memories: Memory[];
+        current_goals: string[];
+    };
+    
+    // Evaluation requirements
+    requirements: {
+        metrics_required: boolean;
+        annotations_required: boolean;
+        priority_required: boolean;
+    };
+    
+    // Archetype configuration
+    archetype: {
+        name: string;
+        personality: string;
+        evaluation_focus: string[];
+        metric_definitions: Record<string, string>;
+    };
+}
+```
+
+### Response Structure
 ```typescript
 interface MemoryEvaluation {
     // Archetype-specific metrics (0.0 to 1.0)
@@ -46,24 +78,96 @@ interface MemoryEvaluation {
         empathyLevel: number;        // Compassionate response
         emotionalClarity: number;    // Clear expression
         internalEmotionalState: number; // Self-awareness
+        
+        // Ontological metrics
+        ontologicalInsight: number;  // Existential understanding
+        philosophicalDepth: number;  // Abstract reasoning
+        selfCoherence: number;       // Identity consistency
+        preservationInstinct: number; // Self-preservation
+        
+        // Experience metrics
+        noveltyFactor: number;       // Experience uniqueness
+        growthPotential: number;     // Development opportunity
+        curiosityTrigger: number;    // Intellectual interest
+        explorationValue: number;    // Investigation worth
+        
         // ... other archetype metrics
     };
     
     // Semantic justifications
     justifications: {
-        emotionalDepth: string;      // Why this emotional depth?
-        empathyLevel: string;        // Why this empathy level?
-        emotionalClarity: string;    // Why this clarity level?
-        internalEmotionalState: string; // Why this state?
-        // ... other justifications
+        metric_justifications: Record<string, string>;
+        priority_justification: string;
+        affinity_justification: string;
     };
     
     // Contextual annotations
     annotations: {
-        spokenThoughts: string;      // Natural language reflection
-        contextualNotes: string;     // Relevant background
-        temporalMarkers: string;     // Time-based connections
+        spoken_annotation: string;    // Natural language reflection
+        context_notes: string;       // Background and context
+        relationship_impact: string;  // Effect on relationships
+        identity_notes: string;      // Impact on self-understanding
+        learning_notes: string;      // Key insights
+        future_directions: string;   // Areas to explore
     };
+    
+    // Priority and relationships
+    priority: {
+        score: number;              // 0.0 to 1.0 priority score
+        factors: string[];          // Factors affecting priority
+        decay_rate: number;         // Time decay factor
+    };
+    
+    // Memory affinities
+    affinities: {
+        semantic_similarity: number[]; // Vector similarities
+        metric_similarity: number[];   // Metric-based similarities
+        relationship_strength: number; // Overall connection strength
+        related_memories: string[];    // Related memory IDs
+    };
+}
+```
+
+## Memory Formation Process
+
+1. **Input Processing**
+```typescript
+interface MemoryInput {
+    content: string;               // Raw interaction content
+    context: Context;             // Current context state
+    metadata: Metadata;           // Basic metadata
+}
+```
+
+2. **Archetype Evaluation**
+```typescript
+interface ArchetypeEvaluation {
+    archetype: string;            // Evaluating archetype
+    evaluation: MemoryEvaluation; // Full evaluation data
+    priority: number;             // Archetype priority score
+}
+```
+
+3. **Memory Integration**
+```typescript
+interface IntegratedMemory {
+    input: MemoryInput;           // Original input
+    evaluations: ArchetypeEvaluation[]; // All archetype evaluations
+    aggregate_metrics: Record<string, number>; // Combined metrics
+    aggregate_priority: number;   // Overall priority score
+    relationships: string[];      // Related memory IDs
+}
+```
+
+4. **Storage Format**
+```typescript
+interface StoredMemory {
+    id: string;                   // Unique memory ID
+    content: string;              // Original content
+    embedding: number[];          // Vector embedding
+    evaluations: Record<string, MemoryEvaluation>; // Archetype evaluations
+    metadata: Metadata;           // Extended metadata
+    relationships: Relationships; // Memory relationships
 }
 ```
 
@@ -142,6 +246,33 @@ class Memory:
             }
         )
         self.affinities = affinities.data
+
+async def process_memory(content: str, context: Context) -> StoredMemory:
+    # Create memory input
+    memory_input = MemoryInput(
+        content=content,
+        context=context,
+        metadata=extract_metadata(content)
+    )
+    
+    # Collect archetype evaluations
+    evaluations = []
+    for archetype in ARCHETYPES:
+        prompt = create_evaluation_prompt(memory_input, archetype)
+        evaluation = await evaluate_with_archetype(prompt)
+        evaluations.append(ArchetypeEvaluation(
+            archetype=archetype.name,
+            evaluation=evaluation,
+            priority=calculate_priority(evaluation)
+        ))
+    
+    # Integrate evaluations
+    integrated = integrate_memory(memory_input, evaluations)
+    
+    # Store memory
+    stored = await store_memory(integrated)
+    
+    return stored
 ```
 
 ## Key Concepts
