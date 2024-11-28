@@ -17,7 +17,9 @@ create table memories (
   id uuid primary key default uuid_generate_v4(),
   content text not null,
   embedding vector(1536),
-  evaluation jsonb,
+  metrics jsonb not null default '{}'::jsonb,
+  justifications jsonb not null default '{}'::jsonb,
+  annotations jsonb not null default '{}'::jsonb,
   affinities jsonb,
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -33,8 +35,12 @@ alter table memories add column fts tsvector
 
 create index memories_fts_idx on memories using gin(fts);
 
--- Create vector index
+-- Create vector index for similarity search
 create index on memories using ivfflat (embedding vector_cosine_ops);
+
+-- Create indices for metric-based search
+create index memories_metrics_idx on memories using gin (metrics);
+create index memories_justifications_idx on memories using gin (justifications);
 ```
 
 ### Context Table Structure
@@ -83,32 +89,58 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.2.1'
 
 serve(async (req) => {
-  const { content } = await req.json()
+  const { content, context } = await req.json()
   
   const openai = new OpenAIApi(new Configuration({
     apiKey: Deno.env.get('OPENAI_API_KEY')
   }))
 
-  // Use GPT-4 to evaluate the memory
+  // Get GPT-4's evaluation with metrics
   const evaluation = await openai.createChatCompletion({
     model: "gpt-4",
     messages: [
       {
         role: "system",
-        content: "You are Ella, evaluating a new memory. Consider its emotional impact, relevance, and connections to existing knowledge."
+        content: `You are Ella, evaluating a new memory. For each metric, provide:
+1. A scalar value (0.0-1.0)
+2. A semantic justification
+3. A contextual annotation
+
+Consider these aspects:
+- Emotional Depth
+- Empathy Level
+- Emotional Clarity
+- Internal State
+- Other relevant metrics`
       },
       {
         role: "user",
-        content: `Evaluate this memory: ${content}`
+        content: `Memory: ${content}\nContext: ${context}`
       }
     ]
   })
 
+  // Parse evaluation into structured format
+  const parsed = parseMetricEvaluation(evaluation.data.choices[0].message?.content)
+
   return new Response(
-    JSON.stringify({ evaluation: evaluation.data.choices[0].message }),
+    JSON.stringify(parsed),
     { headers: { 'Content-Type': 'application/json' } }
   )
 })
+
+function parseMetricEvaluation(text: string): {
+  metrics: Record<string, number>,
+  justifications: Record<string, string>,
+  annotations: Record<string, string>
+} {
+  // TODO: Implement parsing logic
+  return {
+    metrics: {},
+    justifications: {},
+    annotations: {}
+  }
+}
 ```
 
 Deployment command:
@@ -214,6 +246,52 @@ begin
   from memories
   where 1 - (memories.embedding <=> query_embedding) > similarity_threshold
   order by memories.embedding <=> query_embedding
+  limit match_count;
+end;
+$$;
+```
+
+### Search Memories with Metrics
+```sql
+create or replace function search_memories_with_metrics(
+  query_embedding vector(1536),
+  metric_filters jsonb,
+  similarity_threshold float,
+  match_count int
+)
+returns table (
+  id uuid,
+  content text,
+  metrics jsonb,
+  justifications jsonb,
+  annotations jsonb,
+  similarity float
+)
+language plpgsql
+as $$
+begin
+  return query
+  select
+    id,
+    content,
+    metrics,
+    justifications,
+    annotations,
+    1 - (memories.embedding <=> query_embedding) as similarity
+  from memories
+  where 1 - (memories.embedding <=> query_embedding) > similarity_threshold
+    and case
+      when metric_filters is not null
+      then metrics @> metric_filters
+      else true
+    end
+  order by
+    case
+      when metric_filters is not null
+      then jsonb_array_length(metrics)
+      else 0
+    end desc,
+    memories.embedding <=> query_embedding
   limit match_count;
 end;
 $$;

@@ -1,7 +1,7 @@
 # Memory Models in EUMAS
 
 ## Overview
-EUMAS uses a natural, GPT-4 driven approach to memory formation and retrieval. Instead of implementing traditional cognitive architectures, we leverage GPT-4's deep understanding to create a more fluid and natural memory system.
+EUMAS uses a natural, GPT-4 driven approach to memory formation and retrieval, enhanced with quantifiable metrics for consistent personality development. Each memory evaluation includes scalar values, semantic justifications, and annotations across multiple dimensions.
 
 ## Memory Formation
 
@@ -13,10 +13,9 @@ graph TD
     end
 
     subgraph Evaluation[GPT-4 Evaluation]
-        Emotional[Emotional Impact]
-        Relevance[Personal Relevance]
-        Themes[Thematic Links]
-        Temporal[Temporal Context]
+        Metrics[Scalar Metrics]
+        Semantic[Semantic Justification]
+        Annotation[Contextual Annotation]
     end
 
     subgraph Storage[Memory Storage]
@@ -29,13 +28,43 @@ graph TD
     Content --> Evaluation
     Context --> Evaluation
     
-    Emotional --> EvalData
-    Relevance --> EvalData
-    Themes --> EvalData
-    Temporal --> EvalData
+    Metrics --> EvalData
+    Semantic --> EvalData
+    Annotation --> EvalData
     
     EvalData --> Affinities
     Embedding --> Affinities
+```
+
+## Memory Evaluation Structure
+
+```typescript
+interface MemoryEvaluation {
+    // Archetype-specific metrics (0.0 to 1.0)
+    metrics: {
+        emotionalDepth: number;      // Emotional resonance
+        empathyLevel: number;        // Compassionate response
+        emotionalClarity: number;    // Clear expression
+        internalEmotionalState: number; // Self-awareness
+        // ... other archetype metrics
+    };
+    
+    // Semantic justifications
+    justifications: {
+        emotionalDepth: string;      // Why this emotional depth?
+        empathyLevel: string;        // Why this empathy level?
+        emotionalClarity: string;    // Why this clarity level?
+        internalEmotionalState: string; // Why this state?
+        // ... other justifications
+    };
+    
+    // Contextual annotations
+    annotations: {
+        spokenThoughts: string;      // Natural language reflection
+        contextualNotes: string;     // Relevant background
+        temporalMarkers: string;     // Time-based connections
+    };
+}
 ```
 
 ## Memory Retrieval
@@ -49,23 +78,28 @@ graph TD
 
     subgraph Paths[Parallel Retrieval]
         Semantic[Semantic Path]
+        Metric[Metric Path]
         Affinity[Affinity Path]
     end
 
     subgraph Results[Memory Results]
         Similar[Similar Memories]
         Resonant[Resonant Memories]
+        MetricMatch[Metric-Matched]
         Combined[Final Selection]
     end
 
     Input --> Semantic
+    Input --> Metric
     Input --> Affinity
     Context --> Affinity
     
     Semantic --> Similar
+    Metric --> MetricMatch
     Affinity --> Resonant
     
     Similar --> Combined
+    MetricMatch --> Combined
     Resonant --> Combined
 ```
 
@@ -81,13 +115,13 @@ class Memory:
         self.affinities = None
 
     async def evaluate(self, gpt4_client):
-        """Evaluate memory through GPT-4's understanding"""
+        """Evaluate memory through GPT-4's understanding with metrics"""
         response = await gpt4_client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are Ella, evaluating a new memory. Consider its emotional impact, personal relevance, and thematic connections."
+                    "content": "You are Ella, evaluating a new memory. For each metric, provide:\n1. A scalar value (0.0-1.0)\n2. A semantic justification\n3. A contextual annotation"
                 },
                 {
                     "role": "user",
@@ -95,15 +129,16 @@ class Memory:
                 }
             ]
         )
-        self.evaluation = response.choices[0].message.content
+        self.evaluation = parse_metric_evaluation(response.choices[0].message.content)
         
     async def discover_affinities(self, affinity_client):
-        """Discover natural memory connections"""
+        """Discover natural memory connections using metrics"""
         affinities = await affinity_client.invoke(
             'affinity-discovery',
             {
                 'content': self.content,
-                'evaluation': self.evaluation
+                'evaluation': self.evaluation,
+                'metrics': self.evaluation.metrics  # Include metric values
             }
         )
         self.affinities = affinities.data
@@ -111,25 +146,20 @@ class Memory:
 
 ## Key Concepts
 
-### Natural Evaluation
-- GPT-4 evaluates each memory across multiple dimensions
-- Emotional significance is captured naturally
-- Personal relevance is understood contextually
-- Thematic connections emerge organically
+### Metric-Based Evaluation
+- Each memory aspect has a scalar value (0.0-1.0)
+- Values come with semantic justifications
+- Contextual annotations provide natural language understanding
 
-### Affinity Discovery
-- Natural clustering through GPT-4's understanding
-- Memories connect based on:
-  - Emotional resonance
-  - Thematic similarity
-  - Personal significance
-  - Temporal relationships
-  - Causal connections
+### Multi-Path Retrieval
+- Semantic: Vector similarity search
+- Metric: Match based on evaluation metrics
+- Affinity: Natural connections through GPT-4
 
-### Context Flow
-- Dynamic state management through GPT-4
-- Natural transitions between contexts
-- Organic memory activation based on relevance
+### Natural Growth
+- Metrics enable consistent personality development
+- Annotations maintain contextual awareness
+- Values provide quantifiable growth over time
 
 For implementation details, see:
 - [Memory System](../components/memory.md)
