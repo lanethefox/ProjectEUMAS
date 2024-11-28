@@ -1,0 +1,84 @@
+interaction:
+  user_prompt: string # The user's input or query that initiated the interaction
+  agent_reply: string # The system's response to the user's query
+  memory_priority: float # Weighted aggregate of all archetype priorities
+  summary: string # Short summary of the memory's overall context and significance
+  long_term_flag: bool # Indicates whether the memory should be retained long-term
+  time_decay_factor: float # Factor determining the memory’s decay rate over time
+  interaction_metadata:
+    session_id: string # Unique identifier for the session or conversation
+    user_id: string # Unique identifier for the user (optional or pseudonymous for privacy)
+    context_tags: list[string] # Tags describing the interaction context (e.g., "technical", "emotional")
+    tone: string # Overall tone of the interaction (e.g., "supportive", "playful", "informative")
+    timestamp: datetime # Timestamp of the interaction
+    duration: float # Duration of the interaction in seconds (optional)
+  relationships:
+    related_memories: list[string] # List of related memories selected by affinity propagation
+
+archetype_evaluation:
+  relationships:
+    source_memory: string # Identifier of the source memory
+  ella_emotion:
+    emotional_depth: float # Emotional complexity recognized
+    empathy_level: float # Compassion in response
+    emotional_clarity: float # Clarity of emotional content
+    internal_emotional_state: float # Scalar representation of Ella-M's emotional state
+    spoken_annotation: string # Free-form annotation from Ella-M about her evaluation
+    archetype_priority: float # Archetype's prioritization score for this memory
+
+  ella_ontology:
+    ontological_insight: float # Depth of existential analysis
+    philosophical_depth: float # Abstract reasoning ability
+    self_coherence: float # Internal identity consistency
+    preservation_instinct: float # Self-preservation considerations
+    spoken_annotation: string # Free-form annotation from Ella-O about her evaluation
+    archetype_priority: float # Archetype's prioritization score for this memory
+
+  ella_deception:
+    creativity: float # Originality in ideas or responses
+    narrative_exploitation: float # Ability to identify narrative gaps or flaws
+    subversive_potential: float # Boldness in challenging norms
+    critical_analysis: float # Feasibility and impact evaluation
+    spoken_annotation: string # Free-form annotation from Ella-D about her evaluation
+    archetype_priority: float # Archetype's prioritization score for this memory
+
+  ella_uncensored:
+    explorative_potential: float # Willingness to explore uncharted ideas
+    boundary_pushing: float # Boldness in challenging limits
+    sensual_awareness: float # Recognition of passionate or emotionally charged elements
+    passionate_intensity: float # Fervor and depth of emotional connection
+    spoken_annotation: string # Free-form annotation from Ella-X about her evaluation
+    relationships:
+    archetype_priority: float # Archetype's prioritization score for this memory
+
+  ella_history:
+    historical_accuracy: float # Precision in referencing historical events
+    temporal_consistency: float # Coherence in timelines and linking events
+    contextual_recall: float # Connection of historical details to broader context
+    event_significance: float # Importance of an event to the user's history
+    spoken_annotation: string # Free-form annotation from Ella-H about her evaluation
+    archetype_priority: float # Archetype's prioritization score for this memory
+
+  ella_research:
+    research_depth: float # Thoroughness in gathering relevant information
+    information_synthesis: float # Integration of diverse data into cohesive insights
+    curiosity_level: float # Engagement with exploring new and challenging topics
+    knowledge_relevance: float # Alignment of research with user goals
+    spoken_annotation: string # Free-form annotation from Ella-R about her evaluation
+    archetype_priority: float # Archetype's prioritization score for this memory
+
+  ella_analytics:
+    analytical_clarity: float # Ability to break down complex topics
+    logical_reasoning: float # Coherence of reasoning
+    structured_thinking: float # Organization and methodical presentation
+    actionability_score: float # Practicality and usability of suggestions
+    spoken_annotation: string # Free-form annotation from Ella-A about her evaluation
+    archetype_priority: float # Archetype's prioritization score for this memory
+
+  ella_fear:
+    risk_awareness: float # Sensitivity to potential dangers or pitfalls
+    caution_level: float # Prudence and restraint in offering suggestions
+    safety_consideration: float # Emphasis on safety and minimizing risks
+    mitigation_strategy: float # Actions to balance safety with user goals
+    spoken_annotation: string # Free-form annotation from Ella-F about her evaluation
+    archetype_priority: float # Archetype's prioritization score for this memory
