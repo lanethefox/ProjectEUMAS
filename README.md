@@ -1,94 +1,79 @@
 # EUMAS (Ella Unified Memory Augmentation System)
 
 ## Overview
-EUMAS is an elegant memory system that uses GPT-4's natural understanding to create a dynamic, self-organizing network of memories. By combining GPT-4's contextual awareness with affinity-based clustering, EUMAS allows Ella to naturally develop and evolve her personality through her experiences and interactions.
+EUMAS enables natural personality development in AI through genuine interactions and emotional intelligence. Using GPT-4's understanding and simple memory management, Ella develops meaningful connections while maintaining a consistent, evolving identity.
 
-## Core Concepts
+## Core Features
 
-### Natural Memory Formation
-- **Self-Reflection**: Memories are evaluated through different aspects of Ella's personality
-- **Affinity Clustering**: Related memories naturally group based on shared context and meaning
-- **Dynamic State**: Personality emerges organically from conversation flow and memory activation
+### Natural Growth
+- Personality emerges from real interactions
+- Emotional depth develops through experience
+- Consistent identity evolves naturally
 
-### Implementation
+### Emotional Intelligence
+- Deep understanding of emotional context
+- Genuine emotional responses
+- Meaningful relationship building
+
+### Memory System
+- Natural memory formation and retrieval
+- Context-aware interactions
+- Efficient information management
+
+## Implementation
+
 ```python
-# Creating and evaluating a memory
-memory = Memory("I love how the sunset looks today!")
+# Simple memory creation
+memory = Memory(
+    content="I love how the sunset looks today!",
+    context=current_context
+)
+
+# Natural evaluation
 evaluation = await ella.evaluate_memory(memory)
 
-# Finding related memories through affinity
-related = await find_related_memories(memory)
-
-# Natural state emerges from context
-state = await ella.reflect_on_state(
-    context=current_conversation,
-    active_memories=related
+# Context-aware response
+response = await ella.respond(
+    user_message="What did you think of the sunset?",
+    context=evaluation.context
 )
 ```
 
 ## Components
 
-### Memory System
-- [Memory Management](./docs/components/memory.md): How memories are stored and retrieved
-- [Context Engine](./docs/components/context.md): Natural flow of conversation and state
-- [Archetype System](./docs/components/archetypes.md): Different aspects of Ella's personality
-- [Query Engine](./docs/components/query.md): Finding and connecting relevant memories
+### Core Systems
+- [Memory Management](./docs/components/memory.md)
+- [Context Engine](./docs/components/context.md)
+- [Archetype System](./docs/components/archetypes.md)
+- [Query Engine](./docs/components/query.md)
 
-### Infrastructure
-- **Supabase**: PostgreSQL database with vector search capabilities
-- **OpenAI GPT-4**: Core intelligence for memory evaluation and personality
-- **Python Backend**: Simple, efficient memory operations
-- **WebSocket API**: Real-time conversation updates
-
-## Memory Graph
-
-```mermaid
-graph TD
-    M[New Memory] --> E[Ella GPT-4]
-    E --> A[Archetype Evaluation]
-    A --> C[Affinity Clustering]
-    C --> R[Related Memories]
-    R --> S[Natural State]
-    
-    subgraph "Memory Formation"
-        M
-        E
-        A
-    end
-    
-    subgraph "Memory Network"
-        C
-        R
-        S
-    end
-```
+### Documentation
+- [Implementation Guide](./IMPLEMENTATION.md)
+- [Technical Details](./docs/README.md)
+- [Project Intent](./INTENT.md)
 
 ## Getting Started
 
 1. **Setup Environment**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+python -m venv env
+source env/bin/activate  # or `env\Scripts\activate` on Windows
+pip install -r requirements.txt
+```
 
-2. **Configure API Keys**
-   ```bash
-   export OPENAI_API_KEY="your-key-here"
-   export SUPABASE_URL="your-url-here"
-   export SUPABASE_KEY="your-key-here"
-   ```
+2. **Configure Settings**
+```bash
+cp .env.example .env
+# Edit .env with your settings
+```
 
-3. **Run EUMAS**
-   ```bash
-   python -m eumas.main
-   ```
-
-## Documentation
-- [Implementation Guide](./docs/IMPLEMENTATION.md): Detailed setup and usage
-- [Memory Architecture](./docs/components/memory.md): Memory system design
-- [Personality Development](./docs/components/archetypes.md): Different aspects of Ella's personality
+3. **Run Tests**
+```bash
+pytest tests/
+```
 
 ## Contributing
-See [./CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## License
-MIT License - see [./LICENSE](./LICENSE) file.
+MIT License - see [LICENSE](./LICENSE) for details.
