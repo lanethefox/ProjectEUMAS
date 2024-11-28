@@ -1,253 +1,285 @@
-# Simplified EUMAS Implementation Guide
+# Implementation Guide
 
 ## Overview
-EUMAS leverages GPT-4's natural intelligence for memory formation, contextual understanding, and personality development. This guide explains how to implement the core components using Supabase for real-time data management and edge functions for GPT-4 evaluations.
+
+This guide explains how to implement the evaluation system defined in `ella_schema.yaml`. The system uses comprehensive archetype evaluations to form and manage memories.
 
 ## Core Components
 
 ### 1. Memory System
-```python
-from dataclasses import dataclass
-from datetime import datetime
-from typing import List, Dict
-import openai
-from supabase import create_client, Client
 
-@dataclass
+The memory system implements:
+- Memory formation and retention
+- Archetype evaluations
+- Memory relationships
+- Priority management
+
+Key files:
+- `memory/memory.py`: Memory class and formation
+- `memory/evaluation.py`: Archetype evaluations
+- `memory/relationships.py`: Memory relationships
+- `memory/priority.py`: Priority calculations
+
+### 2. Archetype System
+
+Each archetype provides:
+- Core metrics (0.0-1.0 scale)
+- Annotations and notes
+- Metric justifications
+- Priority scores
+
+Archetype implementations:
+- `archetypes/ella_emotion.py`: Ella-M (Emotional)
+- `archetypes/ella_ontology.py`: Ella-O (Ontological)
+- `archetypes/ella_deception.py`: Ella-D (Deception)
+- `archetypes/ella_experience.py`: Ella-X (Experience)
+- `archetypes/ella_historical.py`: Ella-H (Historical)
+- `archetypes/ella_research.py`: Ella-R (Research)
+- `archetypes/ella_analytical.py`: Ella-A (Analytical)
+- `archetypes/ella_protective.py`: Ella-F (Protective)
+
+### 3. Context Engine
+
+Manages:
+- Interaction metadata
+- Memory relationships
+- Archetype contexts
+
+Key files:
+- `context/context.py`: Context management
+- `context/metadata.py`: Metadata handling
+- `context/relationships.py`: Relationship tracking
+
+### 4. Query Engine
+
+Implements:
+- Memory retrieval
+- Relevance scoring
+- Result filtering
+
+Key files:
+- `query/query.py`: Query processing
+- `query/relevance.py`: Scoring system
+- `query/filters.py`: Memory filtering
+
+## Implementation Steps
+
+### 1. Setup Project
+
+```bash
+# Create project structure
+mkdir -p eumas/{memory,archetypes,context,query}
+touch eumas/__init__.py
+
+# Create component directories
+for dir in memory archetypes context query; do
+    mkdir -p eumas/$dir
+    touch eumas/$dir/__init__.py
+done
+```
+
+### 2. Implement Memory System
+
+```python
+# memory/memory.py
 class Memory:
-    content: str
-    embedding: List[float]
-    evaluation: Dict[str, any]
-    affinities: Dict[str, List[str]]
-    created_at: datetime
-    updated_at: datetime
-
-class MemorySystem:
-    def __init__(self, supabase: Client, openai_client: openai.OpenAI):
-        self.db = supabase
-        self.openai = openai_client
-    
-    async def store_memory(self, content: str) -> Memory:
-        # Get GPT-4 embedding
-        embedding = await self.openai.embeddings.create(
-            model="text-embedding-ada-002",
-            input=content
-        )
+    def __init__(self):
+        # Core data
+        self.user_prompt = ""
+        self.agent_reply = ""
+        self.memory_priority = 0.0
+        self.summary = ""
+        self.long_term_flag = False
+        self.time_decay_factor = 0.0
         
-        # Create memory in Supabase
-        memory = await self.db.table('memories').insert({
-            'content': content,
-            'embedding': embedding.data[0].embedding
-        }).execute()
+        # Metadata
+        self.metadata = {
+            'session_id': "",
+            'user_id': "",
+            'context_tags': [],
+            'tone': "",
+            'timestamp': None,
+            'duration': 0.0
+        }
         
-        # Trigger GPT-4 evaluation edge function
-        evaluation = await self.db.functions.invoke(
-            'memory-evaluation',
-            {'content': content}
-        )
-        
-        # Update memory with evaluation
-        await self.db.table('memories').update({
-            'evaluation': evaluation
-        }).eq('id', memory.data[0]['id']).execute()
-        
-        # Discover natural affinities
-        await self.db.functions.invoke(
-            'affinity-discovery',
-            {'memory_id': memory.data[0]['id']}
-        )
-        
-        return memory.data[0]
+        # Relationships
+        self.relationships = {
+            'related_memories': [],
+            'semantic_similarity': [],
+            'metric_similarity': [],
+            'relationship_strength': []
+        }
 ```
 
-### 2. Context Engine
+### 3. Implement Archetypes
+
 ```python
-class ContextEngine:
-    def __init__(self, supabase: Client, openai_client: openai.OpenAI):
-        self.db = supabase
-        self.openai = openai_client
+# archetypes/base.py
+class BaseArchetype:
+    def __init__(self):
+        self.metrics = {}
+        self.annotations = {}
+        self.justifications = {}
+        self.priority = 0.0
     
-    async def get_current_context(self) -> Dict:
-        # Get current context state
-        context = await self.db.table('contexts').select('*').order(
-            'created_at', desc=True
-        ).limit(1).execute()
-        
-        if not context.data:
-            # Initialize new context if none exists
-            state = await self.evaluate_initial_state()
-            context = await self.db.table('contexts').insert({
-                'state': state,
-                'active_memories': []
-            }).execute()
-        
-        return context.data[0]
+    async def evaluate(self, content: str, context: dict):
+        # Implement in subclasses
+        raise NotImplementedError
+
+# archetypes/ella_emotion.py
+class EllaEmotion(BaseArchetype):
+    def __init__(self):
+        super().__init__()
+        self.metrics = {
+            'emotional_depth': 0.0,
+            'empathy_level': 0.0,
+            'emotional_clarity': 0.0,
+            'internal_emotional_state': 0.0
+        }
     
-    async def evaluate_initial_state(self) -> Dict:
-        # Let GPT-4 evaluate initial state
-        response = await self.openai.chat.completions.create(
-            model="gpt-4",
-            messages=[{
-                "role": "system",
-                "content": "You are Ella, evaluating your initial state. Consider your current knowledge, mood, and goals."
-            }]
-        )
-        return response.choices[0].message.content
+    async def evaluate(self, content: str, context: dict):
+        # Implement emotional evaluation
+        pass
 ```
 
-### 3. Query Engine
+### 4. Implement Context Engine
+
 ```python
-class QueryEngine:
-    def __init__(self, supabase: Client, openai_client: openai.OpenAI):
-        self.db = supabase
-        self.openai = openai_client
-    
-    async def search_memories(self, query: str) -> List[Memory]:
-        # Parallel retrieval through semantic and evaluation paths
-        semantic_memories, evaluation_memories = await asyncio.gather(
-            self._semantic_search(query),
-            self._evaluation_based_search(query)
-        )
+# context/context.py
+class InteractionContext:
+    def __init__(self):
+        # Metadata
+        self.metadata = {
+            'session_id': "",
+            'user_id': "",
+            'context_tags': [],
+            'tone': "",
+            'timestamp': None,
+            'duration': 0.0
+        }
         
-        # Combine and deduplicate memories
-        all_memories = {m['id']: m for m in semantic_memories + evaluation_memories}
+        # Relationships
+        self.relationships = {
+            'related_memories': [],
+            'semantic_similarity': [],
+            'metric_similarity': [],
+            'relationship_strength': []
+        }
         
-        # Let GPT-4 evaluate final relevance and ordering
-        response = await self.openai.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are Ella, evaluating which memories are most relevant to the query. Consider both semantic similarity and emotional/thematic connections."
-                },
-                {
-                    "role": "user",
-                    "content": f"Query: {query}\nMemories: {list(all_memories.values())}"
-                }
-            ]
-        )
-        
-        return self.sort_by_relevance(list(all_memories.values()), response.choices[0].message.content)
-    
-    async def _semantic_search(self, query: str) -> List[Memory]:
-        # Get query embedding
-        embedding = await self.openai.embeddings.create(
-            model="text-embedding-ada-002",
-            input=query
-        )
-        
-        # Find semantically similar memories
-        memories = await self.db.rpc(
-            'search_similar_memories',
-            {
-                'query_embedding': embedding.data[0].embedding,
-                'similarity_threshold': 0.7,
-                'match_count': 10
-            }
-        ).execute()
-        
-        return memories.data
-    
-    async def _evaluation_based_search(self, query: str) -> List[Memory]:
-        # Get GPT-4's evaluation of the query
-        evaluation = await self.openai.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are Ella, evaluating a query. Consider its emotional aspects, themes, and deeper meaning."
-                },
-                {
-                    "role": "user",
-                    "content": query
-                }
-            ]
-        )
-        
-        # Use affinity discovery to find resonant memories
-        affinity_results = await self.db.functions.invoke(
-            'affinity-discovery',
-            {
-                'evaluation': evaluation.choices[0].message.content,
-                'mode': 'query'  # Special mode for query-based affinity discovery
-            }
-        )
-        
-        return affinity_results.data
+        # Archetype contexts
+        self.archetype_contexts = {}
 ```
 
-## Setup and Deployment
+### 5. Implement Query Engine
 
-1. **Initialize Supabase Project**
-   ```bash
-   # Install Supabase CLI
-   npm install -g supabase-cli
-   
-   # Login to Supabase
-   supabase login
-   
-   # Initialize project
-   supabase init
-   ```
-
-2. **Deploy Edge Functions**
-   ```bash
-   # Deploy memory evaluation function
-   supabase functions deploy memory-evaluation
-   
-   # Deploy affinity discovery function
-   supabase functions deploy affinity-discovery
-   ```
-
-3. **Configure Environment**
-   ```bash
-   # Set required environment variables
-   export OPENAI_API_KEY="your-key"
-   export SUPABASE_URL="your-project-url"
-   export SUPABASE_KEY="your-anon-key"
-   ```
-
-4. **Run Application**
-   ```bash
-   # Install dependencies
-   pip install -r requirements.txt
-   
-   # Start the application
-   python main.py
-   ```
+```python
+# query/query.py
+class MemoryQuery:
+    def __init__(self):
+        # Query parameters
+        self.query_text = ""
+        self.context_tags = []
+        self.time_range = None
+        
+        # Metadata filters
+        self.metadata_filters = {}
+        
+        # Relationship parameters
+        self.relationship_params = {
+            'min_semantic_similarity': 0.0,
+            'min_metric_similarity': 0.0,
+            'min_relationship_strength': 0.0
+        }
+        
+        # Archetype weights
+        self.archetype_weights = {
+            'ella_emotion': 1.0,
+            'ella_ontology': 1.0,
+            'ella_deception': 1.0,
+            'ella_experience': 1.0,
+            'ella_historical': 1.0,
+            'ella_research': 1.0,
+            'ella_analytical': 1.0,
+            'ella_protective': 1.0
+        }
+```
 
 ## Testing
 
-```python
-async def test_memory_creation():
-    content = "I love watching sunsets by the beach!"
-    memory = await memory_system.store_memory(content)
-    
-    assert memory['content'] == content
-    assert memory['embedding'] is not None
-    assert memory['evaluation'] is not None
-    
-    # Wait for affinity discovery
-    await asyncio.sleep(2)
-    affinities = await memory_system.db.table('memories').select(
-        'affinities'
-    ).eq('id', memory['id']).execute()
-    
-    assert affinities.data[0]['affinities'] is not None
+### 1. Unit Tests
 
-async def test_context_flow():
-    context = await context_engine.get_current_context()
-    assert context['state'] is not None
-    
-    # Subscribe to context changes
-    channel = memory_system.db.channel('context_flow')
-    channel.on('postgres_changes', {
-        'event': 'UPDATE',
-        'schema': 'public',
-        'table': 'contexts'
-    }, lambda payload: print(f"Context updated: {payload}"))
-    
-    await channel.subscribe()
+Create tests for each component:
+```python
+# tests/test_memory.py
+def test_memory_formation():
+    memory = Memory()
+    assert memory.user_prompt == ""
+    assert memory.memory_priority == 0.0
+    assert len(memory.relationships) == 4
+
+# tests/test_archetypes.py
+def test_emotional_evaluation():
+    archetype = EllaEmotion()
+    eval = await archetype.evaluate("I feel happy", {})
+    assert 0 <= eval.metrics['emotional_depth'] <= 1.0
+    assert 0 <= eval.metrics['empathy_level'] <= 1.0
 ```
 
-For more detailed information about the Supabase implementation, see [Supabase Integration](./engineering/supabase.md).
+### 2. Integration Tests
+
+Test component interactions:
+```python
+# tests/test_integration.py
+async def test_memory_formation_with_context():
+    # Create context
+    context = InteractionContext()
+    context.metadata['session_id'] = "test_session"
+    
+    # Form memory
+    memory = await form_memory("Test input", context)
+    assert memory.metadata['session_id'] == "test_session"
+    
+    # Check evaluations
+    assert len(memory.evaluations) == 8  # All archetypes
+    for eval in memory.evaluations:
+        assert 0 <= eval.archetype_priority <= 1.0
+```
+
+## Deployment
+
+1. Package the project:
+```bash
+python setup.py sdist bdist_wheel
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Run tests:
+```bash
+pytest tests/
+```
+
+4. Start the system:
+```python
+from eumas import create_app
+
+app = create_app()
+app.run()
+```
+
+## Integration
+
+The system integrates with:
+- Memory storage system
+- Context management
+- Query processing
+- Archetype evaluations
+
+For detailed documentation, see:
+- [Memory Models](theory/memory-models.md)
+- [Archetype System](components/archetypes.md)
+- [Context Engine](components/context.md)
+- [Query Engine](components/query.md)

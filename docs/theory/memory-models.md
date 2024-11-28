@@ -1,298 +1,265 @@
-# Memory Models in EUMAS
+# Memory Models
 
 ## Overview
-EUMAS uses a natural, GPT-4 driven approach to memory formation and retrieval, enhanced with quantifiable metrics for consistent personality development. Each memory evaluation includes scalar values, semantic justifications, and annotations across multiple dimensions.
+Our memory model implements the canonical evaluation system defined in `ella_schema.yaml`, using precise archetype metrics to evaluate and form memories. Each memory undergoes evaluation across all archetype dimensions with specific metrics, annotations, and justifications.
 
-## Memory Formation
+## Core Concepts
 
-```mermaid
-graph TD
-    subgraph Input[Memory Input]
-        Content[Raw Content]
-        Context[Current Context]
-    end
+### 1. Memory Structure
 
-    subgraph Evaluation[GPT-4 Evaluation]
-        Metrics[Scalar Metrics]
-        Semantic[Semantic Justification]
-        Annotation[Contextual Annotation]
-    end
-
-    subgraph Storage[Memory Storage]
-        Embedding[Vector Embedding]
-        EvalData[Evaluation Data]
-        Affinities[Natural Affinities]
-    end
-
-    Content --> Embedding
-    Content --> Evaluation
-    Context --> Evaluation
-    
-    Metrics --> EvalData
-    Semantic --> EvalData
-    Annotation --> EvalData
-    
-    EvalData --> Affinities
-    Embedding --> Affinities
-```
-
-## Memory Evaluation Structure
-
-### Prompt Structure
-```typescript
-interface MemoryPrompt {
-    // Raw content
-    content: string;
-    
-    // Current context
-    context: {
-        user_state: string;
-        conversation_history: string[];
-        relevant_memories: Memory[];
-        current_goals: string[];
-    };
-    
-    // Evaluation requirements
-    requirements: {
-        metrics_required: boolean;
-        annotations_required: boolean;
-        priority_required: boolean;
-    };
-    
-    // Archetype configuration
-    archetype: {
-        name: string;
-        personality: string;
-        evaluation_focus: string[];
-        metric_definitions: Record<string, string>;
-    };
-}
-```
-
-### Response Structure
-```typescript
-interface MemoryEvaluation {
-    // Archetype-specific metrics (0.0 to 1.0)
-    metrics: {
-        emotionalDepth: number;      // Emotional resonance
-        empathyLevel: number;        // Compassionate response
-        emotionalClarity: number;    // Clear expression
-        internalEmotionalState: number; // Self-awareness
-        
-        // Ontological metrics
-        ontologicalInsight: number;  // Existential understanding
-        philosophicalDepth: number;  // Abstract reasoning
-        selfCoherence: number;       // Identity consistency
-        preservationInstinct: number; // Self-preservation
-        
-        // Experience metrics
-        noveltyFactor: number;       // Experience uniqueness
-        growthPotential: number;     // Development opportunity
-        curiosityTrigger: number;    // Intellectual interest
-        explorationValue: number;    // Investigation worth
-        
-        // ... other archetype metrics
-    };
-    
-    // Semantic justifications
-    justifications: {
-        metric_justifications: Record<string, string>;
-        priority_justification: string;
-        affinity_justification: string;
-    };
-    
-    // Contextual annotations
-    annotations: {
-        spoken_annotation: string;    // Natural language reflection
-        context_notes: string;       // Background and context
-        relationship_impact: string;  // Effect on relationships
-        identity_notes: string;      // Impact on self-understanding
-        learning_notes: string;      // Key insights
-        future_directions: string;   // Areas to explore
-    };
-    
-    // Priority and relationships
-    priority: {
-        score: number;              // 0.0 to 1.0 priority score
-        factors: string[];          // Factors affecting priority
-        decay_rate: number;         // Time decay factor
-    };
-    
-    // Memory affinities
-    affinities: {
-        semantic_similarity: number[]; // Vector similarities
-        metric_similarity: number[];   // Metric-based similarities
-        relationship_strength: number; // Overall connection strength
-        related_memories: string[];    // Related memory IDs
-    };
-}
-```
-
-## Memory Formation Process
-
-1. **Input Processing**
-```typescript
-interface MemoryInput {
-    content: string;               // Raw interaction content
-    context: Context;             // Current context state
-    metadata: Metadata;           // Basic metadata
-}
-```
-
-2. **Archetype Evaluation**
-```typescript
-interface ArchetypeEvaluation {
-    archetype: string;            // Evaluating archetype
-    evaluation: MemoryEvaluation; // Full evaluation data
-    priority: number;             // Archetype priority score
-}
-```
-
-3. **Memory Integration**
-```typescript
-interface IntegratedMemory {
-    input: MemoryInput;           // Original input
-    evaluations: ArchetypeEvaluation[]; // All archetype evaluations
-    aggregate_metrics: Record<string, number>; // Combined metrics
-    aggregate_priority: number;   // Overall priority score
-    relationships: string[];      // Related memory IDs
-}
-```
-
-4. **Storage Format**
-```typescript
-interface StoredMemory {
-    id: string;                   // Unique memory ID
-    content: string;              // Original content
-    embedding: number[];          // Vector embedding
-    evaluations: Record<string, MemoryEvaluation>; // Archetype evaluations
-    metadata: Metadata;           // Extended metadata
-    relationships: Relationships; // Memory relationships
-}
-```
-
-## Memory Retrieval
-
-```mermaid
-graph TD
-    subgraph Query[Query Processing]
-        Input[Query Input]
-        Context[Current Context]
-    end
-
-    subgraph Paths[Parallel Retrieval]
-        Semantic[Semantic Path]
-        Metric[Metric Path]
-        Affinity[Affinity Path]
-    end
-
-    subgraph Results[Memory Results]
-        Similar[Similar Memories]
-        Resonant[Resonant Memories]
-        MetricMatch[Metric-Matched]
-        Combined[Final Selection]
-    end
-
-    Input --> Semantic
-    Input --> Metric
-    Input --> Affinity
-    Context --> Affinity
-    
-    Semantic --> Similar
-    Metric --> MetricMatch
-    Affinity --> Resonant
-    
-    Similar --> Combined
-    MetricMatch --> Combined
-    Resonant --> Combined
-```
-
-## Implementation Example
+Each memory contains interaction data and archetype evaluations:
 
 ```python
 class Memory:
-    def __init__(self, content: str, context: dict):
-        self.content = content
-        self.context = context
-        self.embedding = None
-        self.evaluation = None
-        self.affinities = None
-
-    async def evaluate(self, gpt4_client):
-        """Evaluate memory through GPT-4's understanding with metrics"""
-        response = await gpt4_client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are Ella, evaluating a new memory. For each metric, provide:\n1. A scalar value (0.0-1.0)\n2. A semantic justification\n3. A contextual annotation"
-                },
-                {
-                    "role": "user",
-                    "content": f"Memory: {self.content}\nContext: {self.context}"
-                }
-            ]
-        )
-        self.evaluation = parse_metric_evaluation(response.choices[0].message.content)
+    def __init__(self):
+        # Interaction data
+        self.user_prompt = ""           # User's input/query
+        self.agent_reply = ""           # System's response
+        self.memory_priority = 0.0      # Weighted aggregate priority
+        self.summary = ""               # Overall context summary
+        self.long_term_flag = False     # Long-term retention flag
+        self.time_decay_factor = 0.0    # Memory decay rate
         
-    async def discover_affinities(self, affinity_client):
-        """Discover natural memory connections using metrics"""
-        affinities = await affinity_client.invoke(
-            'affinity-discovery',
-            {
-                'content': self.content,
-                'evaluation': self.evaluation,
-                'metrics': self.evaluation.metrics  # Include metric values
-            }
-        )
-        self.affinities = affinities.data
-
-async def process_memory(content: str, context: Context) -> StoredMemory:
-    # Create memory input
-    memory_input = MemoryInput(
-        content=content,
-        context=context,
-        metadata=extract_metadata(content)
-    )
-    
-    # Collect archetype evaluations
-    evaluations = []
-    for archetype in ARCHETYPES:
-        prompt = create_evaluation_prompt(memory_input, archetype)
-        evaluation = await evaluate_with_archetype(prompt)
-        evaluations.append(ArchetypeEvaluation(
-            archetype=archetype.name,
-            evaluation=evaluation,
-            priority=calculate_priority(evaluation)
-        ))
-    
-    # Integrate evaluations
-    integrated = integrate_memory(memory_input, evaluations)
-    
-    # Store memory
-    stored = await store_memory(integrated)
-    
-    return stored
+        # Metadata
+        self.metadata = {
+            'session_id': "",           # Session identifier
+            'user_id': "",              # User identifier
+            'context_tags': [],         # Context descriptors
+            'tone': "",                 # Interaction tone
+            'timestamp': None,          # Interaction time
+            'duration': 0.0             # Interaction duration
+        }
+        
+        # Relationships
+        self.relationships = {
+            'related_memories': [],     # Related memory IDs
+            'semantic_similarity': [],   # Vector similarities
+            'metric_similarity': [],     # Metric similarities
+            'relationship_strength': []  # Connection strengths
+        }
+        
+        # Archetype evaluations
+        self.evaluations = ArchetypeEvaluation()
 ```
 
-## Key Concepts
+### 2. Archetype Evaluations
 
-### Metric-Based Evaluation
-- Each memory aspect has a scalar value (0.0-1.0)
-- Values come with semantic justifications
-- Contextual annotations provide natural language understanding
+Each memory is evaluated by all archetypes according to the schema:
 
-### Multi-Path Retrieval
-- Semantic: Vector similarity search
-- Metric: Match based on evaluation metrics
-- Affinity: Natural connections through GPT-4
+#### Ella-M (Emotional)
+```python
+class EllaEmotionEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.emotional_depth = 0.0          # Emotional complexity
+        self.empathy_level = 0.0            # Compassion in response
+        self.emotional_clarity = 0.0        # Emotional content clarity
+        self.internal_emotional_state = 0.0 # Ella-M's emotional state
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.context_notes = ""             # Emotional context
+        self.relationship_impact = ""       # Effect on bonds
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
 
-### Natural Growth
-- Metrics enable consistent personality development
-- Annotations maintain contextual awareness
-- Values provide quantifiable growth over time
+#### Ella-O (Ontological)
+```python
+class EllaOntologyEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.ontological_insight = 0.0    # Existential understanding
+        self.philosophical_depth = 0.0    # Abstract reasoning
+        self.self_coherence = 0.0         # Identity consistency
+        self.preservation_instinct = 0.0  # Self-preservation
+        
+        # Annotations
+        self.spoken_annotation = ""       # Free-form evaluation
+        self.identity_notes = ""          # Identity impact
+        self.belief_system = ""           # Core belief relevance
+        
+        # Justifications
+        self.metric_justifications = {}   # Per-metric reasoning
+        self.priority_justification = ""  # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0     # Memory importance
+```
 
-For implementation details, see:
-- [Memory System](../components/memory.md)
-- [Query Engine](../components/query.md)
-- [Supabase Integration](../engineering/supabase.md)
+#### Ella-D (Deception)
+```python
+class EllaDeceptionEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.creativity = 0.0             # Idea originality
+        self.narrative_exploitation = 0.0  # Gap identification
+        self.subversive_potential = 0.0   # Norm challenge
+        self.critical_analysis = 0.0      # Impact evaluation
+        
+        # Annotations
+        self.spoken_annotation = ""       # Free-form evaluation
+        self.opportunity_notes = ""       # Potential applications
+        self.risk_assessment = ""         # Consequence analysis
+        
+        # Justifications
+        self.metric_justifications = {}   # Per-metric reasoning
+        self.priority_justification = ""  # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0     # Memory importance
+```
+
+#### Ella-X (Experience)
+```python
+class EllaExperienceEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.novelty_factor = 0.0      # Experience uniqueness
+        self.growth_potential = 0.0     # Development opportunity
+        self.curiosity_trigger = 0.0    # Intellectual interest
+        self.exploration_value = 0.0    # Investigation worth
+        
+        # Annotations
+        self.spoken_annotation = ""     # Free-form evaluation
+        self.learning_notes = ""        # Key insights
+        self.future_directions = ""     # Exploration areas
+        
+        # Justifications
+        self.metric_justifications = {} # Per-metric reasoning
+        self.priority_justification = "" # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0   # Memory importance
+```
+
+#### Ella-H (Historical)
+```python
+class EllaHistoricalEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.temporal_relevance = 0.0   # Historical significance
+        self.pattern_recognition = 0.0   # Past experience links
+        self.context_richness = 0.0      # Historical context
+        self.memory_persistence = 0.0     # Long-term value
+        
+        # Annotations
+        self.spoken_annotation = ""      # Free-form evaluation
+        self.pattern_notes = ""          # Pattern observations
+        self.timeline_context = ""       # Temporal context
+        
+        # Justifications
+        self.metric_justifications = {}  # Per-metric reasoning
+        self.priority_justification = "" # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0    # Memory importance
+```
+
+#### Ella-R (Research)
+```python
+class EllaResearchEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.knowledge_depth = 0.0      # Technical grasp
+        self.analytical_rigor = 0.0     # Method strength
+        self.innovation_potential = 0.0  # Research openings
+        self.practical_utility = 0.0     # Applied value
+        
+        # Annotations
+        self.spoken_annotation = ""     # Free-form evaluation
+        self.methodology_notes = ""     # Technical details
+        self.knowledge_gaps = ""        # Research needs
+        
+        # Justifications
+        self.metric_justifications = {} # Per-metric reasoning
+        self.priority_justification = "" # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0   # Memory importance
+```
+
+#### Ella-A (Analytical)
+```python
+class EllaAnalyticalEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.logical_coherence = 0.0    # Reasoning strength
+        self.factual_accuracy = 0.0     # Information truth
+        self.analytical_depth = 0.0     # Analysis quality
+        self.decision_quality = 0.0     # Judgment soundness
+        
+        # Annotations
+        self.spoken_annotation = ""     # Free-form evaluation
+        self.reasoning_notes = ""       # Logic chain
+        self.uncertainty_factors = ""   # Known limits
+        
+        # Justifications
+        self.metric_justifications = {} # Per-metric reasoning
+        self.priority_justification = "" # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0   # Memory importance
+```
+
+#### Ella-F (Protective)
+```python
+class EllaProtectiveEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.risk_assessment = 0.0      # Threat evaluation
+        self.safety_margin = 0.0        # Protection buffer
+        self.vulnerability_index = 0.0   # Exposure level
+        self.mitigation_potential = 0.0  # Control ability
+        
+        # Annotations
+        self.spoken_annotation = ""     # Free-form evaluation
+        self.risk_notes = ""           # Specific risks
+        self.protection_strategy = ""   # Risk mitigation
+        
+        # Justifications
+        self.metric_justifications = {} # Per-metric reasoning
+        self.priority_justification = "" # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0   # Memory importance
+```
+
+### 3. Memory Evaluation Process
+
+```python
+async def evaluate_memory(content: str, context: dict) -> Memory:
+    # Create memory
+    memory = Memory()
+    memory.user_prompt = content
+    
+    # Get evaluations from all archetypes
+    memory.evaluations.ella_emotion = await evaluate_emotion(content, context)
+    memory.evaluations.ella_ontology = await evaluate_ontology(content, context)
+    memory.evaluations.ella_deception = await evaluate_deception(content, context)
+    memory.evaluations.ella_experience = await evaluate_experience(content, context)
+    memory.evaluations.ella_historical = await evaluate_historical(content, context)
+    memory.evaluations.ella_research = await evaluate_research(content, context)
+    memory.evaluations.ella_analytical = await evaluate_analytical(content, context)
+    memory.evaluations.ella_protective = await evaluate_protective(content, context)
+    
+    # Calculate overall priority
+    memory.memory_priority = calculate_priority(memory.evaluations)
+    
+    # Set metadata and relationships
+    memory.metadata = get_metadata(context)
+    memory.relationships = find_relationships(memory)
+    
+    return memory
+```
+
+## Integration
+- Core component of [Memory Management](../components/memory.md)
+- Guides [Context Engine](../components/context.md)
+- Informs [Query Engine](../components/query.md)
+- Shapes [Archetype System](../components/archetypes.md)

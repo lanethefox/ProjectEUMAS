@@ -1,53 +1,42 @@
 # EUMAS Documentation
 
-Welcome to the EUMAS documentation. This guide is organized into several sections to help you understand and implement the system.
+Welcome to the EUMAS documentation. This guide explains how EUMAS enables natural personality development through simple yet effective memory management and context understanding.
 
 ## Core Documentation
 
 ### Theory and Design
-- [Theoretical Foundation](theory/README.md): Core concepts and scientific background
-  - [Neuroscience Principles](theory/neuroscience.md)
-  - [Computer Science Concepts](theory/computer-science.md)
-  - [Memory Models](theory/memory-models.md)
+- [Theoretical Foundation](theory/README.md): Core concepts and principles
+  - [Memory Models](theory/memory-models.md): How memories shape personality
+  - [Natural Growth](theory/natural-growth.md): Personality development through experience
 
-### Technical Implementation
-- [Data Architecture](data/README.md): Database design and data modeling
-  - [Schema Design](data/schema.md)
-  - [Graph Structure](data/graph.md)
-  - [Vector Operations](data/vectors.md)
+### Components
+- [Core Components](components/README.md): Essential system elements
+  - [Memory Management](components/memory.md): Simple, natural memory handling
+  - [Context Engine](components/context.md): Understanding conversational context
+  - [Archetype System](components/archetypes.md): Natural personality traits
+  - [Query Engine](components/query.md): Memory retrieval through natural understanding
 
-- [Engineering](engineering/README.md): Technical implementation details
-  - [System Architecture](engineering/architecture.md)
-  - [Supabase Integration](engineering/supabase.md)
-  - [Edge Functions](engineering/edge-functions.md)
-  - [Real-time Features](engineering/realtime.md)
-
-### Components and Features
-- [Core Components](components/README.md): System components and their interactions
-  - [Memory Management](components/memory.md)
-  - [Context Engine](components/context.md)
-  - [Archetype System](components/archetypes.md)
-  - [Query Engine](components/query.md)
-
-### User Experience
-- [UX Design](ux/README.md): User interface and experience design
-  - [Interaction Models](ux/interactions.md)
-  - [Memory Visualization](ux/visualization.md)
-  - [Analytics Dashboard](ux/analytics.md)
+### Implementation
+- [Implementation Guide](IMPLEMENTATION.md): Getting started with EUMAS
+- [Contributing Guide](../CONTRIBUTING.md): How to contribute to the project
 
 ## Quick Links
-- [Getting Started](getting-started.md)
-- [API Reference](api/README.md)
-- [Contributing Guide](../CONTRIBUTING.md)
-- [Changelog](../CHANGELOG.md)
+- [Project Intent](../INTENT.md): Core philosophy and goals
+- [Changelog](../CHANGELOG.md): Project history and updates
 
-## Diagrams
-- [System Architecture](diagrams/architecture.md)
-- [Data Flow](diagrams/data-flow.md)
-- [Component Interaction](diagrams/components.md)
+## Key Concepts
 
-## Additional Resources
-- [Performance Optimization](optimization/README.md)
-- [Security Guidelines](security/README.md)
-- [Deployment Guide](deployment/README.md)
-- [Troubleshooting](troubleshooting/README.md)
+### Natural Memory Formation
+- Memories form naturally through conversations
+- Context drives understanding and connections
+- Simple storage with rich meaning
+
+### Personality Development
+- Emerges from real interactions
+- Shaped by experiences and memories
+- Maintains consistency while allowing growth
+
+### Implementation Philosophy
+- Leverage GPT-4's natural understanding
+- Keep technical complexity minimal
+- Focus on genuine interactions

@@ -1,205 +1,93 @@
-# Core Components
+# Components Documentation
 
 ## Overview
 
-EUMAS is composed of several core components that work together to provide a comprehensive memory management system:
+This directory contains documentation for the core system components that implement the evaluation framework defined in `ella_schema.yaml`.
 
-```mermaid
-graph TD
-    subgraph Memory Management
-        MM[Memory Manager]
-        VE[Vector Engine]
-        GE[Graph Engine]
-    end
+## Core Components
 
-    subgraph Context System
-        CE[Context Engine]
-        CA[Context Analyzer]
-        CP[Context Processor]
-    end
+### Memory Management
+- Implements memory formation and retention
+- Uses comprehensive archetype evaluations
+- Manages memory relationships and priorities
+- See [Memory Management](memory.md)
 
-    subgraph Archetype System
-        AE[Archetype Engine]
-        AM[Archetype Metrics]
-        AS[Archetype State]
-    end
+### Archetype System
+Implements the canonical archetype evaluations:
 
-    subgraph Query System
-        QE[Query Engine]
-        QP[Query Planner]
-        QO[Query Optimizer]
-    end
+1. **Ella-M (Emotional)**
+   - Emotional complexity evaluation
+   - Compassion assessment
+   - Emotional clarity analysis
+   - Internal state tracking
 
-    MM --> VE
-    MM --> GE
-    CE --> CA
-    CE --> CP
-    AE --> AM
-    AE --> AS
-    QE --> QP
-    QE --> QO
+2. **Ella-O (Ontological)**
+   - Existential understanding
+   - Abstract reasoning
+   - Identity consistency
+   - Self-preservation analysis
 
-    MM --> CE
-    CE --> AE
-    AE --> QE
-</graph>
-```
+3. **Ella-D (Deception)**
+   - Creative originality
+   - Narrative analysis
+   - Norm evaluation
+   - Impact assessment
 
-## Component Documentation
+4. **Ella-X (Experience)**
+   - Experience uniqueness
+   - Growth opportunity
+   - Intellectual interest
+   - Exploration value
 
-### Core Systems
-- [Memory Management](memory.md): Memory creation, storage, and retrieval
-- [Context Engine](context.md): Context processing and analysis
-- [Archetype System](archetypes.md): Memory evaluation and classification
-- [Query Engine](query.md): Memory search and retrieval optimization
+5. **Ella-H (Historical)**
+   - Historical significance
+   - Pattern recognition
+   - Context analysis
+   - Memory persistence
 
-### Supporting Systems
-- [Vector Engine](vector-engine.md): Embedding generation and similarity search
-- [Graph Engine](graph-engine.md): Relationship management and traversal
-- [Analytics Engine](analytics.md): System monitoring and performance analysis
+6. **Ella-R (Research)**
+   - Technical depth
+   - Methodological rigor
+   - Innovation potential
+   - Practical application
 
-## Component Interaction
+7. **Ella-A (Analytical)**
+   - Logical reasoning
+   - Factual verification
+   - Analysis depth
+   - Decision evaluation
 
-### Data Flow
-```mermaid
-sequenceDiagram
-    participant Client
-    participant MM as Memory Manager
-    participant CE as Context Engine
-    participant AE as Archetype Engine
-    participant QE as Query Engine
+8. **Ella-F (Protective)**
+   - Risk evaluation
+   - Safety analysis
+   - Vulnerability assessment
+   - Control capability
 
-    Client->>MM: Create Memory
-    activate MM
-    MM->>CE: Extract Context
-    activate CE
-    CE-->>MM: Context Info
-    deactivate CE
-    MM->>AE: Evaluate Memory
-    activate AE
-    AE-->>MM: Evaluation Results
-    deactivate AE
-    MM-->>Client: Memory Created
-    deactivate MM
+See [Archetype System](archetypes.md) for details.
 
-    Client->>QE: Query Memories
-    activate QE
-    QE->>CE: Get Context
-    activate CE
-    CE-->>QE: Context Info
-    deactivate CE
-    QE->>MM: Search Memories
-    activate MM
-    MM-->>QE: Memory Results
-    deactivate MM
-    QE-->>Client: Query Results
-    deactivate QE
-```
+### Context Engine
+- Manages interaction context
+- Tracks metadata and relationships
+- Integrates with memory system
+- See [Context Engine](context.md)
 
-## Performance Considerations
+### Query Engine
+- Processes user interactions
+- Applies archetype evaluations
+- Manages response generation
+- See [Query Engine](query.md)
 
-### Resource Usage
-- Memory allocation and caching strategies
-- Batch processing optimization
-- Connection pooling
-- Query optimization
+## Integration
 
-### Scalability
-- Horizontal scaling of components
-- Load balancing
-- Partitioning strategies
-- Caching layers
+The components work together to:
+1. Capture and evaluate interactions
+2. Form and manage memories
+3. Guide system behavior
+4. Enable natural development
 
-## Error Handling
+## Implementation
 
-### Resilience Patterns
-```mermaid
-stateDiagram-v2
-    [*] --> Normal
-    Normal --> Degraded: Component Failure
-    Degraded --> Normal: Recovery
-    Degraded --> Failed: Critical Failure
-    Failed --> Degraded: Partial Recovery
-    Failed --> Normal: Full Recovery
-```
-
-### Recovery Strategies
-- Circuit breakers
-- Fallback mechanisms
-- Retry policies
-- Graceful degradation
-
-## Monitoring
-
-### Key Metrics
-- Component health
-- Response times
-- Error rates
-- Resource utilization
-
-### Alerting
-- Component failures
-- Performance degradation
-- Resource exhaustion
-- Error thresholds
-
-## Configuration
-
-### Environment Variables
-```bash
-# Component Configuration
-MEMORY_CACHE_SIZE=1000
-CONTEXT_BATCH_SIZE=50
-ARCHETYPE_UPDATE_INTERVAL=300
-QUERY_TIMEOUT=30
-
-# Resource Limits
-MAX_CONNECTIONS=100
-MAX_POOL_SIZE=20
-BATCH_SIZE=50
-```
-
-### Feature Flags
-```python
-FEATURES = {
-    'enable_vector_cache': True,
-    'use_batch_processing': True,
-    'enable_real_time_updates': True,
-    'use_query_optimization': True
-}
-```
-
-## Integration Points
-
-### External Services
-- OpenAI API for embeddings
-- PostgreSQL for storage
-- Redis for caching
-- Supabase for real-time updates
-
-### Internal Communication
-- Event bus
-- Message queues
-- WebSocket connections
-- HTTP endpoints
-
-## Development Guidelines
-
-### Component Development
-1. Follow single responsibility principle
-2. Implement proper error handling
-3. Add comprehensive logging
-4. Include performance metrics
-5. Write thorough documentation
-
-### Testing Strategy
-1. Unit tests for core logic
-2. Integration tests for component interaction
-3. Performance tests for scalability
-4. End-to-end tests for workflows
-
-## Further Reading
-- [Implementation Guide](../IMPLEMENTATION.md)
-- [API Documentation](../api/README.md)
-- [Performance Tuning](../optimization/README.md)
-- [Troubleshooting Guide](../troubleshooting/README.md)
+For implementation details, see:
+- [Memory Models](../theory/memory-models.md)
+- [Evaluation Process](../theory/evaluation.md)
+- [System Architecture](../theory/architecture.md)

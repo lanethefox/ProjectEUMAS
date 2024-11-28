@@ -1,56 +1,60 @@
 # EUMAS (Ella Unified Memory Augmentation System)
 
 ## Overview
-EUMAS enables natural personality development in AI through genuine interactions and emotional intelligence. Using GPT-4's understanding and simple memory management, Ella develops meaningful connections while maintaining a consistent, evolving identity.
+EUMAS enables natural personality development in AI through a sophisticated evaluation system and emotional intelligence. Using GPT-4's understanding combined with quantifiable metrics across multiple archetypes, Ella develops meaningful connections while maintaining a consistent, measurable identity.
 
 ## Core Features
 
-### Natural Growth
-- Personality emerges from real interactions
-- Emotional depth develops through experience
-- Consistent identity evolves naturally
+### Evaluation System
+- Multi-archetype metric evaluation
+- Quantifiable personality development
+- Justified emotional and logical metrics
+- Priority-based memory management
 
 ### Emotional Intelligence
-- Deep understanding of emotional context
-- Genuine emotional responses
-- Meaningful relationship building
+- Deep understanding through Ella-M metrics
+- Measurable empathy and emotional depth
+- Consistent emotional development
+- Quantified relationship building
 
 ### Memory System
-- Natural memory formation and retrieval
-- Context-aware interactions
-- Efficient information management
+- Metric-driven memory formation
+- Multi-archetype evaluation of experiences
+- Priority-based retention and recall
+- Balanced personality growth
 
-## Implementation
+## Example Usage
 
 ```python
-# Simple memory creation
+# Create and evaluate a new memory
 memory = Memory(
     content="I love how the sunset looks today!",
     context=current_context
 )
 
-# Natural evaluation
-evaluation = await ella.evaluate_memory(memory)
+# Get multi-archetype evaluation
+evaluations = evaluate_memory(memory)
+print(evaluations['ella_emotion'].metrics['emotional_depth'])  # 0.85
+print(evaluations['ella_emotion'].annotations['spoken_annotation'])
+# "This moment resonates deeply with me. I sense genuine joy and appreciation."
 
-# Context-aware response
-response = await ella.respond(
-    user_message="What did you think of the sunset?",
-    context=evaluation.context
-)
+# Calculate memory priority
+priority = calculate_priority(evaluations)
+print(f"Memory Priority: {priority}")  # 0.92
 ```
 
 ## Components
 
 ### Core Systems
-- [Memory Management](./docs/components/memory.md)
-- [Context Engine](./docs/components/context.md)
-- [Archetype System](./docs/components/archetypes.md)
-- [Query Engine](./docs/components/query.md)
+- [Memory Management](./docs/components/memory.md): Metric-driven memory system
+- [Context Engine](./docs/components/context.md): Context evaluation and tracking
+- [Archetype System](./docs/components/archetypes.md): Multi-perspective evaluation
+- [Query Engine](./docs/components/query.md): Priority-based memory retrieval
 
 ### Documentation
-- [Implementation Guide](./IMPLEMENTATION.md)
-- [Technical Details](./docs/README.md)
-- [Project Intent](./INTENT.md)
+- [Implementation Guide](./docs/IMPLEMENTATION.md): Getting started with EUMAS
+- [Technical Details](./docs/README.md): System architecture
+- [Project Intent](./INTENT.md): Core philosophy and goals
 
 ## Getting Started
 
@@ -61,15 +65,20 @@ source env/bin/activate  # or `env\Scripts\activate` on Windows
 pip install -r requirements.txt
 ```
 
-2. **Configure Settings**
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
+2. **Start Using EUMAS**
+```python
+from eumas import Ella, Memory, Evaluator
 
-3. **Run Tests**
-```bash
-pytest tests/
+# Initialize system
+ella = Ella()
+evaluator = Evaluator()
+
+# Create and evaluate a memory
+memory = Memory("Hello! How are you today?", current_context)
+evaluations = evaluator.evaluate_memory(memory)
+
+# Get response based on evaluations
+response = ella.respond(memory, evaluations)
 ```
 
 ## Contributing

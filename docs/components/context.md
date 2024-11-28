@@ -2,176 +2,130 @@
 
 ## Overview
 
-The Context Engine uses GPT-4's natural understanding to maintain Ella's awareness of the current conversation, active memories, and emotional state. Instead of complex analyzers and processors, it relies on Ella's ability to comprehend and maintain context naturally.
+The Context Engine manages interaction metadata and relationships as defined in `ella_schema.yaml`. It tracks interaction context, metadata, and relationships between memories.
 
-## Core Concepts
+## Core Features
 
-### Natural Context Flow
-```mermaid
-graph TD
-    C[Conversation] --> E[Ella GPT-4]
-    M[Active Memories] --> E
-    E --> U[Understanding]
-    U --> S[Current State]
+### 1. Interaction Metadata
+
+Each interaction includes:
+- `session_id`: Unique identifier for the session
+- `user_id`: Unique identifier for the user
+- `context_tags`: Tags describing interaction context
+- `tone`: Overall interaction tone
+- `timestamp`: Interaction time
+- `duration`: Interaction duration in seconds
+
+### 2. Memory Relationships
+
+Tracks memory connections through:
+- `related_memories`: List of related memory IDs
+- `semantic_similarity`: Vector similarities
+- `metric_similarity`: Metric-based similarities
+- `relationship_strength`: Overall connection strengths
+
+### 3. Archetype Context
+
+Maintains context for each archetype evaluation:
+
+#### Ella-M (Emotional)
+- Context notes: Emotional background
+- Relationship impact: Bond effects
+- Priority context: Emotional significance
+
+#### Ella-O (Ontological)
+- Identity notes: Self-understanding impact
+- Belief system: Core belief relevance
+- Priority context: Existential significance
+
+#### Ella-D (Deception)
+- Opportunity notes: Potential applications
+- Risk assessment: Consequence analysis
+- Priority context: Creative significance
+
+#### Ella-X (Experience)
+- Learning notes: Key insights
+- Future directions: Exploration areas
+- Priority context: Learning significance
+
+#### Ella-H (Historical)
+- Pattern notes: Observed patterns
+- Timeline context: Temporal relationships
+- Priority context: Historical significance
+
+#### Ella-R (Research)
+- Methodology notes: Technical details
+- Knowledge gaps: Research needs
+- Priority context: Research significance
+
+#### Ella-A (Analytical)
+- Reasoning notes: Logic chain
+- Uncertainty factors: Known limits
+- Priority context: Analytical significance
+
+#### Ella-F (Protective)
+- Risk notes: Security concerns
+- Protection strategy: Risk mitigation
+- Priority context: Security significance
+
+## Context Management
+
+### 1. Context Formation
+```python
+class InteractionContext:
+    def __init__(self):
+        # Metadata
+        self.metadata = {
+            'session_id': "",
+            'user_id': "",
+            'context_tags': [],
+            'tone': "",
+            'timestamp': None,
+            'duration': 0.0
+        }
+        
+        # Relationships
+        self.relationships = {
+            'related_memories': [],
+            'semantic_similarity': [],
+            'metric_similarity': [],
+            'relationship_strength': []
+        }
+        
+        # Archetype contexts
+        self.archetype_contexts = {
+            'ella_emotion': EmotionalContext(),
+            'ella_ontology': OntologicalContext(),
+            'ella_deception': DeceptionContext(),
+            'ella_experience': ExperienceContext(),
+            'ella_historical': HistoricalContext(),
+            'ella_research': ResearchContext(),
+            'ella_analytical': AnalyticalContext(),
+            'ella_protective': ProtectiveContext()
+        }
+```
+
+### 2. Context Integration
+```python
+async def integrate_context(interaction: str, metadata: dict) -> InteractionContext:
+    # Create context
+    context = InteractionContext()
     
-    subgraph "Natural Processing"
-        E
-        U
-    end
+    # Set metadata
+    context.metadata = metadata
     
-    subgraph "Context"
-        C
-        M
-        S
-    end
-```
-
-### Context Structure
-```python
-@dataclass
-class Context:
-    # Current conversation
-    messages: List[Dict[str, any]]
+    # Find relationships
+    context.relationships = await find_relationships(interaction)
     
-    # Active memories
-    memories: List[Memory]
+    # Get archetype contexts
+    context.archetype_contexts = await evaluate_contexts(interaction)
     
-    # Ella's state
-    emotional_state: Dict[str, any]
-    focus_areas: List[str]
-    active_archetypes: List[str]
+    return context
 ```
 
-## Implementation
+## Integration
 
-### 1. Context Maintenance
-```python
-class ContextEngine:
-    async def update_context(self, message: str) -> Context:
-        # Add message to conversation
-        self.messages.append({
-            'content': message,
-            'timestamp': datetime.now()
-        })
-        
-        # Let Ella understand the context
-        understanding = await self.ella.understand_context(
-            messages=self.messages[-10:],  # Recent messages
-            memories=await self.get_active_memories()
-        )
-        
-        # Update current state
-        self.context = Context(
-            messages=self.messages[-10:],
-            memories=understanding.relevant_memories,
-            emotional_state=understanding.emotional_state,
-            focus_areas=understanding.focus_areas,
-            active_archetypes=understanding.active_archetypes
-        )
-        
-        return self.context
-```
-
-### 2. Memory Activation
-```python
-class ContextEngine:
-    async def get_active_memories(self) -> List[Memory]:
-        # Get recent memories
-        recent = await self.db.get_recent_memories(limit=5)
-        
-        # Get emotionally relevant memories
-        emotional = await self.find_emotional_memories()
-        
-        # Get contextually relevant memories
-        contextual = await self.find_contextual_memories()
-        
-        # Let Ella choose most relevant ones
-        return await self.ella.select_relevant_memories(
-            recent + emotional + contextual
-        )
-```
-
-### 3. State Management
-```python
-class ContextEngine:
-    async def get_current_state(self) -> Dict:
-        # Let Ella reflect on current state
-        return await self.ella.reflect_on_state(
-            context=self.context,
-            personality=self.personality
-        )
-    
-    async def set_personality(self, profile: str):
-        # Update Ella's personality profile
-        self.personality = profile
-        await self.ella.adapt_personality(profile)
-```
-
-## Storage
-
-### Database Schema
-```sql
--- Active context
-CREATE TABLE active_context (
-    id UUID PRIMARY KEY,
-    timestamp TIMESTAMPTZ NOT NULL,
-    messages JSONB[],
-    active_memories UUID[],
-    state JSONB
-);
-
--- Context history
-CREATE TABLE context_history (
-    id UUID PRIMARY KEY,
-    context_id UUID REFERENCES active_context(id),
-    timestamp TIMESTAMPTZ NOT NULL,
-    snapshot JSONB
-);
-```
-
-## Example Usage
-
-### Maintaining Context
-```python
-# Update context with new message
-context = await context_engine.update_context(
-    "I'm feeling happy today!"
-)
-
-# View current state
-print(context.emotional_state)
-# {
-#     "mood": "positive",
-#     "energy": "high",
-#     "focus": "personal wellbeing"
-# }
-
-# View active memories
-for memory in context.memories:
-    print(f"{memory.content} (relevance: {memory.relevance})")
-# "Had a great day at the park" (relevance: 0.9)
-# "The sun is shining" (relevance: 0.8)
-```
-
-### Personality Adaptation
-```python
-# Switch personality profile
-await context_engine.set_personality("empathetic")
-
-# Get adapted state
-state = await context_engine.get_current_state()
-print(state)
-# {
-#     "primary_aspect": "emotional",
-#     "response_style": "supportive",
-#     "focus": "user wellbeing"
-# }
-```
-
-## Benefits
-
-1. **Natural Understanding**: Uses GPT-4's comprehension for context
-2. **Dynamic State**: Context flows naturally with conversation
-3. **Memory Integration**: Seamlessly connects relevant memories
-4. **Flexible Personality**: Adapts behavior through different profiles
-5. **Simple Implementation**: No complex analyzers or processors
+The Context Engine integrates with:
+- [Memory Management](memory.md): Provides context for memory formation
+- [Query Engine](query.md): Enables context-aware queries
+- [Archetype System](archetypes.md): Supports archetype evaluations
