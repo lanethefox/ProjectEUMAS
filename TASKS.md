@@ -91,13 +91,27 @@
   - 🧪 Test: Relationship accuracy
   - 🧪 Test: Context linking reliability
 
-### Memory Retention
-- ⭕ Natural Forgetting System
-  - [ ] Importance scoring
-  - [ ] Decay algorithm
-  - [ ] Retention policy
-  - 🧪 Test: Forgetting curve accuracy
-  - 🧪 Test: Important memory retention
+### Memory Enhancement System
+- ⭕ Precision Mode System
+  - [ ] Toggleable precision state management
+  - [ ] Long-term memory tagging
+  - [ ] Core memory designation
+  - [ ] Exact memory preservation for tagged items
+  - [ ] Precision recall enforcement for long-term/core memories
+  - 🧪 Test: Precision mode toggle functionality
+  - 🧪 Test: Long-term memory preservation
+  - 🧪 Test: Core memory handling
+  - 🧪 Test: Recall accuracy in precision mode
+
+- ⭕ Memory Importance System
+  - [ ] Access frequency tracking
+  - [ ] Context-based importance scoring
+  - [ ] Relationship weight calculation
+  - [ ] Core memory detection
+  - [ ] Long-term significance evaluation
+  - 🧪 Test: Importance score accuracy
+  - 🧪 Test: Weight distribution validation
+  - 🧪 Test: Memory classification accuracy
 
 ### Integration Tests - Milestone 2
 - [ ] Memory system end-to-end testing
