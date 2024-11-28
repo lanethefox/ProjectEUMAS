@@ -103,38 +103,77 @@ class QueryEngine:
         self.openai = openai_client
     
     async def search_memories(self, query: str) -> List[Memory]:
+        # Parallel retrieval through semantic and evaluation paths
+        semantic_memories, evaluation_memories = await asyncio.gather(
+            self._semantic_search(query),
+            self._evaluation_based_search(query)
+        )
+        
+        # Combine and deduplicate memories
+        all_memories = {m['id']: m for m in semantic_memories + evaluation_memories}
+        
+        # Let GPT-4 evaluate final relevance and ordering
+        response = await self.openai.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are Ella, evaluating which memories are most relevant to the query. Consider both semantic similarity and emotional/thematic connections."
+                },
+                {
+                    "role": "user",
+                    "content": f"Query: {query}\nMemories: {list(all_memories.values())}"
+                }
+            ]
+        )
+        
+        return self.sort_by_relevance(list(all_memories.values()), response.choices[0].message.content)
+    
+    async def _semantic_search(self, query: str) -> List[Memory]:
         # Get query embedding
         embedding = await self.openai.embeddings.create(
             model="text-embedding-ada-002",
             input=query
         )
         
-        # Search similar memories
+        # Find semantically similar memories
         memories = await self.db.rpc(
             'search_similar_memories',
             {
                 'query_embedding': embedding.data[0].embedding,
-                'similarity_threshold': 0.8,
-                'match_count': 5
+                'similarity_threshold': 0.7,
+                'match_count': 10
             }
         ).execute()
         
-        # Let GPT-4 evaluate relevance
-        response = await self.openai.chat.completions.create(
+        return memories.data
+    
+    async def _evaluation_based_search(self, query: str) -> List[Memory]:
+        # Get GPT-4's evaluation of the query
+        evaluation = await self.openai.chat.completions.create(
             model="gpt-4",
             messages=[
                 {
                     "role": "system",
-                    "content": "You are Ella, evaluating which memories are most relevant to the query."
+                    "content": "You are Ella, evaluating a query. Consider its emotional aspects, themes, and deeper meaning."
                 },
                 {
                     "role": "user",
-                    "content": f"Query: {query}\nMemories: {memories.data}"
+                    "content": query
                 }
             ]
         )
         
-        return self.sort_by_relevance(memories.data, response.choices[0].message.content)
+        # Use affinity discovery to find resonant memories
+        affinity_results = await self.db.functions.invoke(
+            'affinity-discovery',
+            {
+                'evaluation': evaluation.choices[0].message.content,
+                'mode': 'query'  # Special mode for query-based affinity discovery
+            }
+        )
+        
+        return affinity_results.data
 ```
 
 ## Setup and Deployment
