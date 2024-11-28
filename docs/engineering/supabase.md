@@ -15,12 +15,37 @@ create extension vector;
 -- Create hypertable for memory embeddings
 create table memories (
   id uuid primary key default uuid_generate_v4(),
+  content text not null,
   embedding vector(1536),
-  metadata jsonb
+  evaluation jsonb,
+  affinities jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
 );
+
+-- Trigger for automatic timestamp updates
+create trigger handle_updated_at before update on memories
+  for each row execute procedure moddatetime (updated_at);
+
+-- Enable full-text search
+alter table memories add column fts tsvector
+  generated always as (to_tsvector('english', content)) stored;
+
+create index memories_fts_idx on memories using gin(fts);
 
 -- Create vector index
 create index on memories using ivfflat (embedding vector_cosine_ops);
+```
+
+### Context Table Structure
+```sql
+create table contexts (
+  id uuid primary key default uuid_generate_v4(),
+  state jsonb not null,
+  active_memories jsonb,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
 ```
 
 Reference: [Supabase Vector Support](https://supabase.com/docs/guides/database/extensions/pgvector)
@@ -47,6 +72,97 @@ serve(async (req) => {
 Deployment command:
 ```bash
 supabase functions deploy memory-clustering
+```
+
+Reference: [Edge Functions Guide](https://supabase.com/docs/guides/functions)
+
+### Memory Evaluation Service
+```typescript
+// /functions/memory-evaluation/index.ts
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.2.1'
+
+serve(async (req) => {
+  const { content } = await req.json()
+  
+  const openai = new OpenAIApi(new Configuration({
+    apiKey: Deno.env.get('OPENAI_API_KEY')
+  }))
+
+  // Use GPT-4 to evaluate the memory
+  const evaluation = await openai.createChatCompletion({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: "You are Ella, evaluating a new memory. Consider its emotional impact, relevance, and connections to existing knowledge."
+      },
+      {
+        role: "user",
+        content: `Evaluate this memory: ${content}`
+      }
+    ]
+  })
+
+  return new Response(
+    JSON.stringify({ evaluation: evaluation.data.choices[0].message }),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+})
+```
+
+Deployment command:
+```bash
+supabase functions deploy memory-evaluation
+```
+
+### Natural Affinity Discovery
+```typescript
+// /functions/affinity-discovery/index.ts
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from '@supabase/supabase-js'
+import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.2.1'
+
+serve(async (req) => {
+  const { memory_id } = await req.json()
+  
+  // Get related memories using vector similarity
+  const { data: similarMemories } = await supabase
+    .rpc('search_similar_memories', {
+      query_embedding: memory.embedding,
+      similarity_threshold: 0.8,
+      match_count: 5
+    })
+
+  // Use GPT-4 to discover natural affinities
+  const openai = new OpenAIApi(new Configuration({
+    apiKey: Deno.env.get('OPENAI_API_KEY')
+  }))
+
+  const affinities = await openai.createChatCompletion({
+    model: "gpt-4",
+    messages: [
+      {
+        role: "system",
+        content: "You are Ella, discovering natural connections between memories. Consider thematic, emotional, and contextual relationships."
+      },
+      {
+        role: "user",
+        content: `Discover affinities between these memories: ${JSON.stringify(similarMemories)}`
+      }
+    ]
+  })
+
+  return new Response(
+    JSON.stringify({ affinities: affinities.data.choices[0].message }),
+    { headers: { 'Content-Type': 'application/json' } }
+  )
+})
+```
+
+Deployment command:
+```bash
+supabase functions deploy affinity-discovery
 ```
 
 Reference: [Edge Functions Guide](https://supabase.com/docs/guides/functions)
@@ -145,6 +261,49 @@ const subscription = supabase
 ```
 
 Reference: [Database Streaming](https://supabase.com/docs/guides/realtime/postgres-changes)
+
+## Real-time Features
+
+### Memory State Synchronization
+```typescript
+// Subscribe to memory evaluations and affinity updates
+const channel = supabase
+  .channel('memory_evaluations')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'memories',
+      filter: 'evaluation IS NOT NULL'
+    },
+    (payload) => {
+      updateMemoryState(payload)
+    }
+  )
+  .subscribe()
+```
+
+### Context Flow Management
+```typescript
+// Subscribe to context state changes
+const contextChannel = supabase
+  .channel('context_flow')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'contexts'
+    },
+    (payload) => {
+      updateContextFlow(payload)
+    }
+  )
+  .subscribe()
+```
+
+Reference: [Realtime Guide](https://supabase.com/docs/guides/realtime)
 
 ## Performance Optimization
 
