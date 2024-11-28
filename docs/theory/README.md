@@ -1,34 +1,40 @@
 # Theoretical Foundation
 
 ## Overview
-EUMAS is built on a foundation that combines principles from neuroscience, cognitive psychology, and computer science. This section explains the theoretical underpinnings of our memory system.
+EUMAS uses GPT-4's natural intelligence to form, evaluate, and retrieve memories in a way that mirrors human cognitive processes. Instead of implementing complex cognitive architectures, we leverage GPT-4's deep understanding of context, emotion, and meaning.
 
 ## Core Concepts
 
-### Memory Formation and Retrieval
-- [Neuroscience Principles](neuroscience.md)
-  - Hippocampal indexing theory
-  - Neural pattern completion
-  - Memory consolidation
+### Natural Memory Formation
+- **Evaluation-Driven Storage**
+  - Each memory is evaluated by GPT-4 across multiple dimensions
+  - Emotional significance
+  - Personal relevance
+  - Contextual importance
+  - Thematic connections
 
-- [Computer Science Concepts](computer-science.md)
-  - Graph theory and traversal
-  - Vector embeddings
-  - Clustering algorithms
+### Dual-Path Memory Retrieval
+- **Semantic Path**
+  - Vector embeddings capture semantic meaning
+  - Similar experiences and concepts cluster naturally
+  - Fast, efficient similarity search
 
-### Memory Models
-- [Memory Models](memory-models.md)
-  - Working memory
-  - Long-term potentiation
-  - Associative memory networks
+- **Affinity Path**
+  - GPT-4 evaluates deeper connections
+  - Emotional resonance
+  - Thematic links
+  - Personal significance
+  - Temporal relationships
+  - Causal connections
 
-## Key Papers and Research
-1. ["The hippocampus as a cognitive map"](https://doi.org/10.1093/acprof:oso/9780198572060.001.0001) - O'Keefe & Nadel
-2. ["Pattern completion in the hippocampal network"](https://doi.org/10.1016/j.neuron.2015.05.012) - Rolls
-3. ["Vector Symbolic Architectures"](https://doi.org/10.1016/j.cogpsych.2019.101309) - Plate
+### Context Flow
+- Natural state transitions through GPT-4's understanding
+- Dynamic memory activation based on relevance
+- Continuous evaluation of conversation flow
 
-## Implementation Insights
-Learn how these theoretical principles are implemented in EUMAS:
-- [Graph Structure Implementation](../data/graph.md)
-- [Vector Operations](../data/vectors.md)
+## Implementation
+See how these concepts are implemented:
+- [Memory System](../components/memory.md)
 - [Context Engine](../components/context.md)
+- [Query Engine](../components/query.md)
+- [Supabase Integration](../engineering/supabase.md)
