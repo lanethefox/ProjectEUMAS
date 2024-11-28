@@ -3,6 +3,32 @@
 ## Overview
 EUMAS is a biologically-inspired memory system that combines graph-based memory storage with neural architectures to create a flexible, context-aware memory retrieval system. The system draws inspiration from both computer science principles of graph databases and neuroscientific understanding of human memory formation and recall.
 
+## Documentation
+
+### Theory and Design
+- [Theoretical Foundation](docs/theory/README.md)
+- [Neuroscience Principles](docs/theory/neuroscience.md)
+- [Computer Science Concepts](docs/theory/computer-science.md)
+- [Memory Models](docs/theory/memory-models.md)
+
+### Implementation
+- [Implementation Plan](docs/IMPLEMENTATION.md)
+- [System Architecture](docs/diagrams/architecture.md)
+- [Supabase Integration](docs/engineering/supabase.md)
+
+### Data Architecture
+- [Data Overview](docs/data/README.md)
+- [Schema Design](docs/data/schema.md)
+- [Graph Structure](docs/data/graph.md)
+- [Vector Operations](docs/data/vectors.md)
+
+### Core Components
+- [Components Overview](docs/components/README.md)
+- [Memory Management](docs/components/memory.md)
+- [Context Engine](docs/components/context.md)
+- [Archetype System](docs/components/archetypes.md)
+- [Query Engine](docs/components/query.md)
+
 ## Infrastructure
 
 ### Core Components
