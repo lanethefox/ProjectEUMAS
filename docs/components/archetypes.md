@@ -431,6 +431,161 @@ async def test_archetype_classification():
     assert evolved.metadata.version > matches[0].archetype.metadata.version
 ```
 
+## Archetype State
+
+The Archetype State represents the dynamic, evolving nature of memory patterns in EUMAS. It maintains the current state of each archetype, including:
+
+### State Components
+```typescript
+interface ArchetypeState {
+    id: string;
+    archetype_id: string;
+    current_state: {
+        active: boolean;
+        strength: number;  // 0.0 to 1.0
+        stability: number; // How resistant to change
+        plasticity: number; // How adaptable to new patterns
+    };
+    activation_history: {
+        timestamps: timestamp[];
+        contexts: string[];
+        success_rates: number[];
+    };
+    learning_state: {
+        training_phase: TrainingPhase;
+        learning_rate: number;
+        last_update: timestamp;
+        samples_since_update: number;
+    };
+    adaptation_metrics: {
+        drift_rate: number;      // How quickly pattern is changing
+        coherence_score: number; // How well-defined the pattern is
+        novelty_score: number;   // How unique compared to other archetypes
+    };
+}
+
+enum TrainingPhase {
+    INITIALIZATION,  // Initial pattern formation
+    REFINEMENT,     // Fine-tuning with new examples
+    STABILIZATION,  // Pattern has matured
+    ADAPTATION      // Actively adapting to new patterns
+}
+```
+
+### State Transitions
+```mermaid
+stateDiagram-v2
+    [*] --> Initialization
+    Initialization --> Refinement: Sufficient examples
+    Refinement --> Stabilization: Pattern converges
+    Stabilization --> Adaptation: New patterns emerge
+    Adaptation --> Refinement: Pattern shift detected
+    Refinement --> Stabilization: New pattern stabilizes
+```
+
+### State Management
+```python
+class ArchetypeStateManager:
+    async def update_state(self, state: ArchetypeState, memory: Memory):
+        # Update activation history
+        state.activation_history.timestamps.append(datetime.now())
+        state.activation_history.contexts.append(memory.context)
+        
+        # Calculate success rate
+        success = await self.evaluate_match(state, memory)
+        state.activation_history.success_rates.append(success)
+        
+        # Update strength and stability
+        state.current_state.strength = self.calculate_strength(
+            state.activation_history
+        )
+        state.current_state.stability = self.calculate_stability(
+            state.activation_history
+        )
+        
+        # Adjust learning parameters
+        await self.adapt_learning_rate(state)
+        
+        # Check for phase transitions
+        await self.check_phase_transition(state)
+```
+
+### Adaptation Mechanisms
+
+1. **Pattern Strength**
+   - Increases with successful matches
+   - Decays over time without activation
+   - Influences pattern matching threshold
+
+2. **Stability vs Plasticity**
+   - Stability increases with consistent matches
+   - Plasticity allows adaptation to new patterns
+   - Balance determines learning rate
+
+3. **Phase Transitions**
+   - Triggered by pattern consistency
+   - Affects learning rate and threshold
+   - Determines adaptation behavior
+
+### Usage Example
+```python
+async def handle_memory_activation(
+    memory: Memory,
+    archetype: Archetype
+):
+    # Get current state
+    state = await state_manager.get_state(archetype.id)
+    
+    # Update state based on memory
+    await state_manager.update_state(state, memory)
+    
+    # Check for adaptation needs
+    if state.adaptation_metrics.drift_rate > DRIFT_THRESHOLD:
+        await archetype_manager.adapt_pattern(
+            archetype,
+            state
+        )
+    
+    # Update learning parameters
+    if state.learning_state.training_phase == TrainingPhase.ADAPTATION:
+        await adjust_learning_parameters(
+            archetype,
+            state
+        )
+```
+
+### Monitoring and Analysis
+
+1. **Pattern Health Metrics**
+   ```python
+   async def analyze_pattern_health(state: ArchetypeState):
+       return {
+           'strength': state.current_state.strength,
+           'stability': state.current_state.stability,
+           'coherence': state.adaptation_metrics.coherence_score,
+           'drift': state.adaptation_metrics.drift_rate
+       }
+   ```
+
+2. **Learning Progress**
+   ```python
+   async def track_learning_progress(state: ArchetypeState):
+       return {
+           'phase': state.learning_state.training_phase,
+           'samples': state.learning_state.samples_since_update,
+           'learning_rate': state.learning_state.learning_rate,
+           'success_rate': calculate_success_rate(
+               state.activation_history
+           )
+       }
+   ```
+
+The Archetype State system ensures that patterns:
+- Evolve naturally with new experiences
+- Maintain stability when well-established
+- Adapt to significant changes
+- Balance consistency with flexibility
+
 ## Further Reading
 - [Memory Management](memory.md)
 - [Context Engine](context.md)
