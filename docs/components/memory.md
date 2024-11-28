@@ -2,308 +2,185 @@
 
 ## Overview
 
-The Memory Management system is responsible for creating, storing, retrieving, and maintaining memories within EUMAS. It implements efficient storage strategies and optimizes memory access patterns.
+The Memory Management system in EUMAS uses GPT-4's natural understanding to create a dynamic network of interconnected memories. Instead of complex state machines or multiple storage systems, it relies on Ella's ability to evaluate and connect memories through different aspects of her personality.
 
-## Architecture
+## Core Concepts
 
+### Memory Formation
 ```mermaid
 graph TD
-    subgraph Memory Manager
-        MC[Memory Creator]
-        MS[Memory Store]
-        MR[Memory Retriever]
-        MI[Memory Indexer]
+    M[New Memory] --> E[Ella GPT-4]
+    E --> A[Archetype Evaluation]
+    A --> C[Affinity Clustering]
+    C --> R[Related Memories]
+    
+    subgraph "Natural Processing"
+        E
+        A
     end
-
-    subgraph Storage Layer
-        VDB[(Vector Store)]
-        GDB[(Graph Store)]
-        RDB[(Relational Store)]
+    
+    subgraph "Memory Network"
+        C
+        R
     end
-
-    MC --> MS
-    MS --> VDB
-    MS --> GDB
-    MS --> RDB
-    MR --> VDB
-    MR --> GDB
-    MR --> RDB
-    MI --> VDB
-    MI --> GDB
-    MI --> RDB
 ```
 
-## Memory Structure
-
-### Memory Object
-```typescript
-interface Memory {
-    id: string;
-    content: string;
-    embedding: number[];
-    metadata: {
-        created_at: timestamp;
-        updated_at: timestamp;
-        source: string;
-        context: string;
-        archetype: string;
-    };
-    relationships: {
-        parent_id?: string;
-        child_ids: string[];
-        related_ids: string[];
-    };
-    metrics: {
-        importance: number;
-        relevance: number;
-        recency: number;
-    };
-}
-```
-
-## Core Operations
-
-### Memory Creation
+### Memory Structure
 ```python
-async def create_memory(
-    content: str,
-    context: str,
-    source: str,
-    relationships: dict = None
-) -> Memory:
-    # Generate embedding
-    embedding = await vector_engine.generate_embedding(content)
+@dataclass
+class Memory:
+    # Core content
+    id: UUID
+    content: str
+    timestamp: datetime
     
-    # Create memory object
-    memory = Memory(
-        content=content,
-        embedding=embedding,
-        metadata={
-            'context': context,
-            'source': source,
-            'created_at': datetime.now()
-        },
-        relationships=relationships or {}
-    )
+    # Ella's understanding
+    evaluations: List[Dict[str, any]]
+    context: Dict[str, any]
     
-    # Store in databases
-    await store_memory(memory)
-    
-    return memory
+    # Natural connections
+    affinities: List[Dict[str, any]]
 ```
 
-### Memory Retrieval
+## Implementation
+
+### 1. Memory Creation
 ```python
-async def retrieve_memories(
-    query: str,
-    context: str = None,
-    limit: int = 10,
-    threshold: float = 0.7
-) -> List[Memory]:
-    # Generate query embedding
-    query_embedding = await vector_engine.generate_embedding(query)
-    
-    # Search vector store
-    similar_memories = await vector_store.similarity_search(
-        query_embedding,
-        limit=limit,
-        threshold=threshold
-    )
-    
-    # Apply context filter if provided
-    if context:
-        similar_memories = [
-            m for m in similar_memories
-            if context_engine.matches_context(m, context)
-        ]
-    
-    return similar_memories
-```
-
-## Storage Strategy
-
-### Vector Store
-- Uses pgvector for embedding storage
-- Implements HNSW index for fast similarity search
-- Optimizes for high-dimensional vector operations
-
-### Graph Store
-- Stores memory relationships
-- Enables efficient traversal
-- Supports relationship types and weights
-
-### Relational Store
-- Stores metadata and metrics
-- Handles ACID transactions
-- Provides SQL query capabilities
-
-## Memory Lifecycle
-
-```mermaid
-stateDiagram-v2
-    [*] --> Created
-    Created --> Active
-    Active --> Archived
-    Active --> Deleted
-    Archived --> Active
-    Archived --> Deleted
-    Deleted --> [*]
-```
-
-### States
-1. **Created**: Initial memory creation
-2. **Active**: Regular access and updates
-3. **Archived**: Reduced priority, compressed storage
-4. **Deleted**: Marked for removal
-
-## Optimization
-
-### Caching Strategy
-```python
-CACHE_CONFIG = {
-    'memory_cache_size': 1000,
-    'vector_cache_size': 100,
-    'cache_ttl': 3600,
-    'prefetch_threshold': 0.8
-}
-```
-
-### Batch Operations
-```python
-async def batch_create_memories(
-    memories: List[Dict],
-    batch_size: int = 50
-) -> List[Memory]:
-    results = []
-    for batch in chunks(memories, batch_size):
-        # Generate embeddings in parallel
-        embeddings = await vector_engine.batch_generate_embeddings(
-            [m['content'] for m in batch]
+class MemoryManager:
+    async def create_memory(self, content: str) -> Memory:
+        # Create new memory
+        memory = Memory(
+            content=content,
+            timestamp=datetime.now()
         )
         
-        # Create memory objects
-        memory_objects = [
-            Memory(content=m['content'],
-                  embedding=e,
-                  metadata=m['metadata'])
-            for m, e in zip(batch, embeddings)
-        ]
+        # Let Ella evaluate it
+        memory.evaluations = await self.evaluate_memory(memory)
         
-        # Batch store
-        await store_memories(memory_objects)
-        results.extend(memory_objects)
-    
-    return results
+        # Get current context
+        memory.context = await self.get_current_context()
+        
+        # Find natural connections
+        memory.affinities = await self.find_affinities(memory)
+        
+        # Store in database
+        await self.store_memory(memory)
+        
+        return memory
 ```
 
-## Error Handling
-
-### Recovery Mechanisms
+### 2. Memory Retrieval
 ```python
-class MemoryOperationError(Exception):
-    pass
-
-async def safe_memory_operation(operation: Callable, *args, **kwargs):
-    try:
-        return await operation(*args, **kwargs)
-    except VectorStoreError:
-        # Handle vector store failures
-        await failover_to_backup_store()
-    except GraphStoreError:
-        # Handle graph store failures
-        await rebuild_relationships()
-    except DatabaseError:
-        # Handle database failures
-        await initiate_recovery()
-    raise MemoryOperationError("Failed to complete memory operation")
+class MemoryManager:
+    async def find_memories(
+        self,
+        query: str,
+        context: Dict = None
+    ) -> List[Memory]:
+        # Get Ella's understanding
+        understanding = await self.ella.understand_query(query)
+        
+        # Find relevant memories
+        memories = await self.db.search(
+            query=understanding,
+            context=context or await self.get_current_context()
+        )
+        
+        # Sort by natural relevance
+        return self.sort_by_relevance(memories)
 ```
 
-## Monitoring
-
-### Key Metrics
-- Creation rate
-- Retrieval latency
-- Storage utilization
-- Cache hit ratio
-
-### Health Checks
+### 3. Memory Network
 ```python
-async def check_memory_system_health():
-    return {
-        'vector_store': await check_vector_store(),
-        'graph_store': await check_graph_store(),
-        'relational_store': await check_relational_store(),
-        'cache': await check_cache_status()
-    }
+class MemoryManager:
+    async def find_affinities(self, memory: Memory) -> List[Dict]:
+        # Get Ella's perspective on relationships
+        affinities = await self.ella.find_connections(
+            memory,
+            await self.get_recent_memories()
+        )
+        
+        # Create weighted links
+        for affinity in affinities:
+            await self.db.create_link(
+                source=memory.id,
+                target=affinity.memory_id,
+                weight=affinity.strength
+            )
+        
+        return affinities
 ```
 
-## Configuration
+## Storage
 
-### Environment Variables
-```bash
-# Storage Configuration
-VECTOR_STORE_URL=postgresql://user:pass@host:5432/db
-GRAPH_STORE_URL=neo4j://user:pass@host:7687
-REDIS_URL=redis://host:6379
+### Database Schema
+```sql
+-- Memories table
+CREATE TABLE memories (
+    id UUID PRIMARY KEY,
+    content TEXT NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
+    evaluations JSONB[],
+    context JSONB
+);
 
-# Operation Limits
-MAX_BATCH_SIZE=100
-MAX_VECTOR_DIMENSION=1536
-CACHE_TTL=3600
+-- Natural connections
+CREATE TABLE memory_links (
+    source_id UUID REFERENCES memories(id),
+    target_id UUID REFERENCES memories(id),
+    weight FLOAT NOT NULL,
+    PRIMARY KEY (source_id, target_id)
+);
 
-# Performance Tuning
-PREFETCH_SIZE=50
-INDEX_REFRESH_INTERVAL=300
+-- Efficient retrieval
+CREATE INDEX ON memories USING GIN (context);
+CREATE INDEX ON memories USING GIN (evaluations);
 ```
 
-## Integration
+## Example Usage
 
-### Event System
+### Creating a Memory
 ```python
-@memory_events.on('memory.created')
-async def handle_memory_created(memory: Memory):
-    # Update indexes
-    await memory_indexer.index_memory(memory)
-    
-    # Notify subscribers
-    await notify_memory_subscribers(memory)
-    
-    # Update analytics
-    await update_memory_metrics(memory)
+# Create a new memory
+memory = await memory_manager.create_memory(
+    "I love how the sunset looks today!"
+)
+
+# View Ella's evaluations
+print(memory.evaluations)
+# [
+#     {"type": "emotional", "value": "joy", "intensity": 0.8},
+#     {"type": "creative", "value": "visual appreciation"},
+#     {"type": "temporal", "value": "present moment"}
+# ]
+
+# View natural connections
+print(memory.affinities)
+# [
+#     {"memory_id": "...", "strength": 0.9, "type": "similar experience"},
+#     {"memory_id": "...", "strength": 0.7, "type": "shared emotion"}
+# ]
 ```
 
-## Development Guidelines
-
-### Best Practices
-1. Always use batch operations for multiple memories
-2. Implement proper error handling and recovery
-3. Monitor performance metrics
-4. Use appropriate indexes
-5. Implement caching strategies
-
-### Testing
+### Finding Related Memories
 ```python
-async def test_memory_creation():
-    # Test basic creation
-    memory = await create_memory(
-        content="Test memory",
-        context="test",
-        source="unit_test"
-    )
-    assert memory.id is not None
-    
-    # Test relationships
-    related_memory = await create_memory(
-        content="Related memory",
-        context="test",
-        source="unit_test",
-        relationships={'related_ids': [memory.id]}
-    )
-    assert memory.id in related_memory.relationships['related_ids']
+# Search for memories
+memories = await memory_manager.find_memories(
+    "What makes me happy?"
+)
+
+# Natural clustering of results
+for memory in memories:
+    print(f"{memory.content} (relevance: {memory.relevance})")
+# "I love how the sunset looks today!" (relevance: 0.9)
+# "Had a great time at the beach" (relevance: 0.8)
+# "The garden is blooming!" (relevance: 0.7)
 ```
 
-## Further Reading
-- [Vector Operations](../data/vectors.md)
-- [Graph Operations](../data/graph.md)
-- [Performance Tuning](../optimization/README.md)
-- [Error Handling](../troubleshooting/README.md)
+## Benefits
+
+1. **Natural Understanding**: Uses GPT-4's comprehension instead of rigid rules
+2. **Flexible Connections**: Memories link based on natural affinities
+3. **Context Awareness**: Every operation considers the current conversation state
+4. **Simple Implementation**: No complex state machines or multiple models
+5. **Efficient Storage**: Only stores what's needed for natural retrieval

@@ -2,397 +2,176 @@
 
 ## Overview
 
-The Context Engine analyzes and manages contextual information for memories, enabling more accurate memory retrieval and relationship building. It processes both explicit and implicit context signals to create a rich contextual understanding.
+The Context Engine uses GPT-4's natural understanding to maintain Ella's awareness of the current conversation, active memories, and emotional state. Instead of complex analyzers and processors, it relies on Ella's ability to comprehend and maintain context naturally.
 
-## Architecture
+## Core Concepts
 
+### Natural Context Flow
 ```mermaid
 graph TD
-    subgraph Context Engine
-        CA[Context Analyzer]
-        CP[Context Processor]
-        CE[Context Extractor]
-        CM[Context Manager]
+    C[Conversation] --> E[Ella GPT-4]
+    M[Active Memories] --> E
+    E --> U[Understanding]
+    U --> S[Current State]
+    
+    subgraph "Natural Processing"
+        E
+        U
     end
-
-    subgraph Analysis Tools
-        NLP[NLP Processor]
-        TA[Temporal Analyzer]
-        SA[Semantic Analyzer]
+    
+    subgraph "Context"
+        C
+        M
+        S
     end
-
-    subgraph Storage
-        CS[(Context Store)]
-        MS[(Memory Store)]
-    end
-
-    CA --> NLP
-    CA --> TA
-    CA --> SA
-    CP --> CA
-    CE --> CP
-    CM --> CE
-    CM --> CS
-    CM --> MS
 ```
 
-## Context Structure
-
-### Context Object
-```typescript
-interface Context {
-    id: string;
-    type: ContextType;
-    value: string;
-    metadata: {
-        created_at: timestamp;
-        updated_at: timestamp;
-        confidence: number;
-        source: string;
-    };
-    relationships: {
-        memory_ids: string[];
-        related_contexts: string[];
-    };
-    parameters: {
-        temporal?: {
-            start_time?: timestamp;
-            end_time?: timestamp;
-            duration?: number;
-        };
-        spatial?: {
-            location?: string;
-            coordinates?: [number, number];
-        };
-        semantic?: {
-            topics: string[];
-            entities: string[];
-            sentiment: number;
-        };
-    };
-}
-
-enum ContextType {
-    TEMPORAL,
-    SPATIAL,
-    SEMANTIC,
-    EMOTIONAL,
-    TASK,
-    CUSTOM
-}
-```
-
-## Core Operations
-
-### Context Extraction
+### Context Structure
 ```python
-async def extract_context(
-    content: str,
-    metadata: dict = None
-) -> Context:
-    # Extract temporal context
-    temporal = await temporal_analyzer.analyze(content)
+@dataclass
+class Context:
+    # Current conversation
+    messages: List[Dict[str, any]]
     
-    # Extract semantic context
-    semantic = await semantic_analyzer.analyze(content)
+    # Active memories
+    memories: List[Memory]
     
-    # Extract emotional context
-    emotional = await emotional_analyzer.analyze(content)
-    
-    # Combine contexts
-    context = Context(
-        type=determine_primary_context_type(
-            temporal, semantic, emotional
-        ),
-        value=content,
-        metadata={
-            'confidence': calculate_confidence(
-                temporal, semantic, emotional
-            ),
-            'source': metadata.get('source', 'auto')
-        },
-        parameters={
-            'temporal': temporal,
-            'semantic': semantic,
-            'emotional': emotional
-        }
-    )
-    
-    return context
+    # Ella's state
+    emotional_state: Dict[str, any]
+    focus_areas: List[str]
+    active_archetypes: List[str]
 ```
 
-### Context Processing
-```python
-async def process_context(
-    context: Context,
-    memory_ids: List[str] = None
-) -> ProcessedContext:
-    # Enrich context with additional information
-    enriched = await context_enricher.enrich(context)
-    
-    # Link to memories if provided
-    if memory_ids:
-        await link_context_to_memories(enriched, memory_ids)
-    
-    # Update context store
-    await context_store.update(enriched)
-    
-    return enriched
-```
+## Implementation
 
-## Analysis Components
-
-### Temporal Analysis
+### 1. Context Maintenance
 ```python
-class TemporalAnalyzer:
-    async def analyze(self, content: str) -> TemporalContext:
-        # Extract temporal expressions
-        temporal_expressions = self.extract_temporal_expressions(
-            content
+class ContextEngine:
+    async def update_context(self, message: str) -> Context:
+        # Add message to conversation
+        self.messages.append({
+            'content': message,
+            'timestamp': datetime.now()
+        })
+        
+        # Let Ella understand the context
+        understanding = await self.ella.understand_context(
+            messages=self.messages[-10:],  # Recent messages
+            memories=await self.get_active_memories()
         )
         
-        # Normalize to timestamps
-        timestamps = self.normalize_timestamps(
-            temporal_expressions
+        # Update current state
+        self.context = Context(
+            messages=self.messages[-10:],
+            memories=understanding.relevant_memories,
+            emotional_state=understanding.emotional_state,
+            focus_areas=understanding.focus_areas,
+            active_archetypes=understanding.active_archetypes
         )
         
-        # Determine temporal relationships
-        relationships = self.analyze_temporal_relationships(
-            timestamps
-        )
+        return self.context
+```
+
+### 2. Memory Activation
+```python
+class ContextEngine:
+    async def get_active_memories(self) -> List[Memory]:
+        # Get recent memories
+        recent = await self.db.get_recent_memories(limit=5)
         
-        return TemporalContext(
-            timestamps=timestamps,
-            relationships=relationships
+        # Get emotionally relevant memories
+        emotional = await self.find_emotional_memories()
+        
+        # Get contextually relevant memories
+        contextual = await self.find_contextual_memories()
+        
+        # Let Ella choose most relevant ones
+        return await self.ella.select_relevant_memories(
+            recent + emotional + contextual
         )
 ```
 
-### Semantic Analysis
+### 3. State Management
 ```python
-class SemanticAnalyzer:
-    async def analyze(self, content: str) -> SemanticContext:
-        # Extract topics and entities
-        topics = await self.extract_topics(content)
-        entities = await self.extract_entities(content)
-        
-        # Perform sentiment analysis
-        sentiment = await self.analyze_sentiment(content)
-        
-        # Generate semantic embedding
-        embedding = await self.generate_embedding(content)
-        
-        return SemanticContext(
-            topics=topics,
-            entities=entities,
-            sentiment=sentiment,
-            embedding=embedding
+class ContextEngine:
+    async def get_current_state(self) -> Dict:
+        # Let Ella reflect on current state
+        return await self.ella.reflect_on_state(
+            context=self.context,
+            personality=self.personality
         )
+    
+    async def set_personality(self, profile: str):
+        # Update Ella's personality profile
+        self.personality = profile
+        await self.ella.adapt_personality(profile)
 ```
 
-## Context Management
+## Storage
 
-### Context Storage
+### Database Schema
+```sql
+-- Active context
+CREATE TABLE active_context (
+    id UUID PRIMARY KEY,
+    timestamp TIMESTAMPTZ NOT NULL,
+    messages JSONB[],
+    active_memories UUID[],
+    state JSONB
+);
+
+-- Context history
+CREATE TABLE context_history (
+    id UUID PRIMARY KEY,
+    context_id UUID REFERENCES active_context(id),
+    timestamp TIMESTAMPTZ NOT NULL,
+    snapshot JSONB
+);
+```
+
+## Example Usage
+
+### Maintaining Context
 ```python
-async def store_context(
-    context: Context,
-    batch: bool = False
-) -> str:
-    if batch:
-        return await context_store.batch_insert([context])
-    
-    # Store context
-    context_id = await context_store.insert(context)
-    
-    # Update indexes
-    await update_context_indexes(context)
-    
-    # Notify subscribers
-    await notify_context_change(context)
-    
-    return context_id
+# Update context with new message
+context = await context_engine.update_context(
+    "I'm feeling happy today!"
+)
+
+# View current state
+print(context.emotional_state)
+# {
+#     "mood": "positive",
+#     "energy": "high",
+#     "focus": "personal wellbeing"
+# }
+
+# View active memories
+for memory in context.memories:
+    print(f"{memory.content} (relevance: {memory.relevance})")
+# "Had a great day at the park" (relevance: 0.9)
+# "The sun is shining" (relevance: 0.8)
 ```
 
-### Context Retrieval
+### Personality Adaptation
 ```python
-async def retrieve_context(
-    query: str,
-    context_type: ContextType = None,
-    limit: int = 10
-) -> List[Context]:
-    # Generate query embedding
-    query_embedding = await generate_embedding(query)
-    
-    # Search context store
-    contexts = await context_store.search(
-        embedding=query_embedding,
-        context_type=context_type,
-        limit=limit
-    )
-    
-    # Rank and filter results
-    ranked_contexts = await rank_contexts(contexts, query)
-    
-    return ranked_contexts
+# Switch personality profile
+await context_engine.set_personality("empathetic")
+
+# Get adapted state
+state = await context_engine.get_current_state()
+print(state)
+# {
+#     "primary_aspect": "emotional",
+#     "response_style": "supportive",
+#     "focus": "user wellbeing"
+# }
 ```
 
-## Optimization
+## Benefits
 
-### Caching Strategy
-```python
-CONTEXT_CACHE_CONFIG = {
-    'max_size': 1000,
-    'ttl': 3600,
-    'update_interval': 300
-}
-
-class ContextCache:
-    async def get_or_compute(
-        self,
-        key: str,
-        computer: Callable
-    ) -> Context:
-        # Check cache
-        cached = await self.get(key)
-        if cached:
-            return cached
-        
-        # Compute if not found
-        result = await computer()
-        
-        # Cache result
-        await self.set(key, result)
-        
-        return result
-```
-
-### Batch Processing
-```python
-async def batch_process_contexts(
-    contexts: List[Context],
-    batch_size: int = 50
-) -> List[ProcessedContext]:
-    results = []
-    for batch in chunks(contexts, batch_size):
-        # Process batch in parallel
-        processed = await asyncio.gather(*[
-            process_context(context)
-            for context in batch
-        ])
-        results.extend(processed)
-    return results
-```
-
-## Error Handling
-
-### Recovery Mechanisms
-```python
-class ContextError(Exception):
-    pass
-
-async def safe_context_operation(
-    operation: Callable,
-    *args,
-    **kwargs
-):
-    try:
-        return await operation(*args, **kwargs)
-    except AnalysisError:
-        # Handle analysis failures
-        await fallback_analysis()
-    except StorageError:
-        # Handle storage failures
-        await recover_context_store()
-    except ProcessingError:
-        # Handle processing failures
-        await retry_processing()
-    raise ContextError("Failed to complete context operation")
-```
-
-## Monitoring
-
-### Key Metrics
-```python
-CONTEXT_METRICS = {
-    'extraction_rate': 'contexts_extracted/second',
-    'processing_latency': 'milliseconds',
-    'storage_usage': 'bytes',
-    'cache_hit_ratio': 'percentage'
-}
-
-async def monitor_context_system():
-    return {
-        'extraction': await monitor_extraction(),
-        'processing': await monitor_processing(),
-        'storage': await monitor_storage(),
-        'cache': await monitor_cache()
-    }
-```
-
-## Configuration
-
-### Environment Variables
-```bash
-# Analysis Configuration
-NLP_MODEL=gpt-4
-SENTIMENT_MODEL=distilbert
-ENTITY_MODEL=spacy
-
-# Processing Limits
-MAX_CONTEXT_SIZE=10000
-BATCH_SIZE=50
-CACHE_SIZE=1000
-
-# Storage Configuration
-CONTEXT_STORE_URL=postgresql://user:pass@host:5432/db
-REDIS_URL=redis://host:6379
-```
-
-## Integration
-
-### Event System
-```python
-@context_events.on('context.created')
-async def handle_context_created(context: Context):
-    # Update indexes
-    await update_context_indexes(context)
-    
-    # Notify subscribers
-    await notify_context_subscribers(context)
-    
-    # Update analytics
-    await update_context_metrics(context)
-```
-
-## Development Guidelines
-
-### Best Practices
-1. Always validate context before processing
-2. Use batch operations for multiple contexts
-3. Implement proper error handling
-4. Monitor performance metrics
-5. Use appropriate caching strategies
-
-### Testing
-```python
-async def test_context_extraction():
-    # Test basic extraction
-    context = await extract_context(
-        "Meeting with John at 2pm tomorrow"
-    )
-    assert context.type == ContextType.TEMPORAL
-    
-    # Test semantic extraction
-    semantic = context.parameters['semantic']
-    assert 'Meeting' in semantic.topics
-    assert 'John' in semantic.entities
-    
-    # Test temporal extraction
-    temporal = context.parameters['temporal']
-    assert temporal.start_time is not None
-```
-
-## Further Reading
-- [Memory Management](memory.md)
-- [Archetype System](archetypes.md)
-- [Query Engine](query.md)
-- [Analytics](../analytics/README.md)
+1. **Natural Understanding**: Uses GPT-4's comprehension for context
+2. **Dynamic State**: Context flows naturally with conversation
+3. **Memory Integration**: Seamlessly connects relevant memories
+4. **Flexible Personality**: Adapts behavior through different profiles
+5. **Simple Implementation**: No complex analyzers or processors
