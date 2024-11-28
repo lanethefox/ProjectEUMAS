@@ -1,4 +1,4 @@
-# EUMAS: Enhanced Unified Memory Augmentation System
+# EUMAS (Ella Unified Memory Augmentation System)
 
 ## Overview
 EUMAS is a biologically-inspired memory system that combines graph-based memory storage with neural architectures to create a flexible, context-aware memory retrieval system. The system draws inspiration from both computer science principles of graph databases and neuroscientific understanding of human memory formation and recall.
