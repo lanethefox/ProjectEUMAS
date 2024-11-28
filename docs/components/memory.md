@@ -25,8 +25,6 @@ class Memory:
         self.metadata = {
             'session_id': "",           # Session identifier
             'user_id': "",              # User identifier
-            'context_tags': [],         # Context descriptors
-            'tone': "",                 # Interaction tone
             'timestamp': None,          # Interaction time
             'duration': 0.0             # Interaction duration
         }
@@ -67,7 +65,166 @@ class EllaEmotionEval:
         self.archetype_priority = 0.0       # Memory importance
 ```
 
-[Similar evaluation classes exist for all other archetypes: Ella-O, Ella-D, Ella-X, Ella-H, Ella-R, Ella-A, Ella-F]
+#### Ella-O (Ontological)
+```python
+class EllaOntologyEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.ontological_insight = 0.0      # Existential understanding
+        self.philosophical_depth = 0.0      # Abstract reasoning
+        self.self_coherence = 0.0          # Identity consistency
+        self.preservation_instinct = 0.0    # Self-preservation
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.identity_notes = ""            # Impact on identity
+        self.belief_system = ""             # Core beliefs impact
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
+
+#### Ella-D (Deception)
+```python
+class EllaDeceptionEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.creativity = 0.0               # Idea originality
+        self.narrative_exploitation = 0.0   # Gap identification
+        self.subversive_potential = 0.0     # Norm challenging
+        self.critical_analysis = 0.0        # Impact evaluation
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.opportunity_notes = ""         # Potential applications
+        self.risk_assessment = ""           # Consequence analysis
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
+
+#### Ella-X (Experience)
+```python
+class EllaExperienceEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.novelty_factor = 0.0          # Experience uniqueness
+        self.growth_potential = 0.0        # Development opportunity
+        self.curiosity_trigger = 0.0       # Intellectual interest
+        self.exploration_value = 0.0       # Investigation worth
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.learning_notes = ""            # Key insights
+        self.future_directions = ""         # Areas to explore
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
+
+#### Ella-H (Historical)
+```python
+class EllaHistoricalEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.temporal_relevance = 0.0       # Historical significance
+        self.pattern_recognition = 0.0      # Past experience patterns
+        self.context_richness = 0.0        # Historical context depth
+        self.memory_persistence = 0.0       # Long-term importance
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.pattern_notes = ""             # Observed patterns
+        self.timeline_context = ""          # Temporal relationships
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
+
+#### Ella-R (Research)
+```python
+class EllaResearchEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.knowledge_depth = 0.0          # Technical understanding
+        self.analytical_rigor = 0.0         # Methodological strength
+        self.innovation_potential = 0.0     # Research opportunities
+        self.practical_utility = 0.0        # Applied value
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.methodology_notes = ""         # Technical details
+        self.knowledge_gaps = ""            # Areas for research
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
+
+#### Ella-A (Analytical)
+```python
+class EllaAnalyticalEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.logical_coherence = 0.0        # Reasoning strength
+        self.factual_accuracy = 0.0         # Information correctness
+        self.analytical_depth = 0.0         # Analysis thoroughness
+        self.decision_quality = 0.0         # Judgment soundness
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.reasoning_notes = ""           # Logic chain
+        self.uncertainty_factors = ""       # Known limitations
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
+
+#### Ella-F (Protective)
+```python
+class EllaProtectiveEval:
+    def __init__(self):
+        # Core metrics (0.0 to 1.0)
+        self.risk_assessment = 0.0          # Threat evaluation
+        self.safety_margin = 0.0            # Protective buffer
+        self.vulnerability_index = 0.0      # Exposure level
+        self.mitigation_potential = 0.0     # Control capability
+        
+        # Annotations
+        self.spoken_annotation = ""         # Free-form evaluation
+        self.risk_notes = ""                # Specific concerns
+        self.protection_strategy = ""       # Mitigation approach
+        
+        # Justifications
+        self.metric_justifications = {}     # Per-metric reasoning
+        self.priority_justification = ""    # Priority explanation
+        
+        # Priority
+        self.archetype_priority = 0.0       # Memory importance
+```
 
 ### 3. Memory Formation
 

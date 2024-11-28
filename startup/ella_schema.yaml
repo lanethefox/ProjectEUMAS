@@ -8,8 +8,6 @@ interaction:
   interaction_metadata:
     session_id: string # Unique identifier for the session or conversation
     user_id: string # Unique identifier for the user (optional or pseudonymous for privacy)
-    context_tags: list[string] # Tags describing the interaction context (e.g., "technical", "emotional")
-    tone: string # Overall tone of the interaction (e.g., "supportive", "playful", "informative")
     timestamp: datetime # Timestamp of the interaction
     duration: float # Duration of the interaction in seconds (optional)
   relationships:
@@ -70,7 +68,7 @@ archetype_evaluation:
     # Priority
     archetype_priority: float # Archetype's prioritization score for this memory (0.0 to 1.0)
 
-  ella_experience:
+  ella_uncensored:
     # Core metrics
     novelty_factor: float # Uniqueness of experience (0.0 to 1.0)
     growth_potential: float # Opportunity for development (0.0 to 1.0)
