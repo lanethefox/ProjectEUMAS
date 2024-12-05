@@ -1,131 +1,184 @@
-# Context Engine
+# EllaContext
+
+EllaContext is the core context management component of EUMAS, responsible for understanding, retrieving, and synthesizing contextual information from conversations and memories.
 
 ## Overview
 
-The Context Engine manages interaction metadata and relationships as defined in `ella_schema.yaml`. It tracks interaction context, metadata, and relationships between memories.
+EllaContext serves as the bridge between user interactions and memory systems, providing rich contextual understanding for natural personality development. It processes incoming messages, retrieves relevant memories, and synthesizes context for EllaPrimary's response generation.
 
-## Core Features
+## Core Functions
 
-### 1. Interaction Metadata
+### Context Processing
+- **Input Analysis**: Processes user messages for key themes and semantic meaning
+- **Memory Retrieval**: Fetches relevant memories using semantic and metric-based search
+- **Context Synthesis**: Combines current interaction with historical context
+- **Core Memory Integration**: Special handling of high-priority memories
 
-Each interaction includes:
-- `session_id`: Unique identifier for the session
-- `user_id`: Unique identifier for the user
-- `context_tags`: Tags describing interaction context
-- `tone`: Overall interaction tone
-- `timestamp`: Interaction time
-- `duration`: Interaction duration in seconds
+### Memory Types
 
-### 2. Memory Relationships
+1. **Core Memories**
+   - Highest priority memories that define personality
+   - Always included verbatim in context
+   - Direct influence on response generation
 
-Tracks memory connections through:
-- `related_memories`: List of related memory IDs
-- `semantic_similarity`: Vector similarities
-- `metric_similarity`: Metric-based similarities
-- `relationship_strength`: Overall connection strengths
+2. **Long-term Memories**
+   - Persistent, significant memories
+   - Fully included in context synthesis
+   - Strong influence on personality consistency
 
-### 3. Archetype Context
+3. **Recent Memories**
+   - Recent interactions and experiences
+   - Weighted by recency and relevance
+   - Important for conversation continuity
 
-Maintains context for each archetype evaluation:
+## Implementation Guide
 
-#### Ella-M (Emotional)
-- Context notes: Emotional background
-- Relationship impact: Bond effects
-- Priority context: Emotional significance
+### Context Schema
 
-#### Ella-O (Ontological)
-- Identity notes: Self-understanding impact
-- Belief system: Core belief relevance
-- Priority context: Existential significance
+```yaml
+ContextRequest:
+  user_message: str          # Current user input
+  session_id: str           # Unique session identifier
+  user_id: str             # User identifier
+  timestamp: datetime      # Current interaction time
+  retrieval_params:
+    semantic_threshold: float  # Minimum similarity threshold
+    max_memories: int         # Maximum memories to retrieve
+    include_core: bool        # Whether to include core memories
+    time_window: int         # Time window for recent memories
 
-#### Ella-D (Deception)
-- Opportunity notes: Potential applications
-- Risk assessment: Consequence analysis
-- Priority context: Creative significance
-
-#### Ella-X (Experience)
-- Learning notes: Key insights
-- Future directions: Exploration areas
-- Priority context: Learning significance
-
-#### Ella-H (Historical)
-- Pattern notes: Observed patterns
-- Timeline context: Temporal relationships
-- Priority context: Historical significance
-
-#### Ella-R (Research)
-- Methodology notes: Technical details
-- Knowledge gaps: Research needs
-- Priority context: Research significance
-
-#### Ella-A (Analytical)
-- Reasoning notes: Logic chain
-- Uncertainty factors: Known limits
-- Priority context: Analytical significance
-
-#### Ella-F (Protective)
-- Risk notes: Security concerns
-- Protection strategy: Risk mitigation
-- Priority context: Security significance
-
-## Context Management
-
-### 1. Context Formation
-```python
-class InteractionContext:
-    def __init__(self):
-        # Metadata
-        self.metadata = {
-            'session_id': "",
-            'user_id': "",
-            'context_tags': [],
-            'tone': "",
-            'timestamp': None,
-            'duration': 0.0
-        }
-        
-        # Relationships
-        self.relationships = {
-            'related_memories': [],
-            'semantic_similarity': [],
-            'metric_similarity': [],
-            'relationship_strength': []
-        }
-        
-        # Archetype contexts
-        self.archetype_contexts = {
-            'ella_emotion': EmotionalContext(),
-            'ella_ontology': OntologicalContext(),
-            'ella_deception': DeceptionContext(),
-            'ella_experience': ExperienceContext(),
-            'ella_historical': HistoricalContext(),
-            'ella_research': ResearchContext(),
-            'ella_analytical': AnalyticalContext(),
-            'ella_protective': ProtectiveContext()
-        }
+ContextResponse:
+  relevant_memories: List[Memory]  # Retrieved memories
+  core_memories: List[Memory]      # Core personality memories
+  context_summary: str            # Synthesized context
+  archetype_states: Dict          # Current archetype states
+  relationship_graph: Dict        # Memory relationship data
 ```
 
-### 2. Context Integration
+### Key Methods
+
+1. **Context Retrieval**
 ```python
-async def integrate_context(interaction: str, metadata: dict) -> InteractionContext:
-    # Create context
-    context = InteractionContext()
-    
-    # Set metadata
-    context.metadata = metadata
-    
-    # Find relationships
-    context.relationships = await find_relationships(interaction)
-    
-    # Get archetype contexts
-    context.archetype_contexts = await evaluate_contexts(interaction)
-    
-    return context
+def retrieve_context(
+    message: str,
+    params: ContextParams
+) -> ContextResponse:
+    """
+    Retrieve and synthesize context for the current interaction
+    """
 ```
 
-## Integration
+2. **Memory Search**
+```python
+def search_memories(
+    query: str,
+    search_type: str,  # 'semantic' or 'metric'
+    threshold: float
+) -> List[Memory]:
+    """
+    Search memory database for relevant memories
+    """
+```
 
-The Context Engine integrates with:
-- [Memory Management](memory.md): Provides context for memory formation
-- [Query Engine](query.md): Enables context-aware queries
-- [Archetype System](archetypes.md): Supports archetype evaluations
+3. **Context Synthesis**
+```python
+def synthesize_context(
+    current_message: str,
+    memories: List[Memory]
+) -> str:
+    """
+    Create coherent context summary from memories
+    """
+```
+
+4. **Core Memory Management**
+```python
+def process_core_memories(
+    memories: List[Memory]
+) -> List[Memory]:
+    """
+    Special handling for core personality memories
+    """
+```
+
+## Usage Examples
+
+### Basic Context Retrieval
+```python
+context = ella_context.retrieve_context(
+    message="How are you feeling today?",
+    params=ContextParams(
+        semantic_threshold=0.7,
+        max_memories=10,
+        include_core=True
+    )
+)
+```
+
+### Memory Search
+```python
+related_memories = ella_context.search_memories(
+    query="previous conversations about emotions",
+    search_type="semantic",
+    threshold=0.8
+)
+```
+
+### Context Synthesis
+```python
+summary = ella_context.synthesize_context(
+    current_message="Let's talk about your growth",
+    memories=related_memories
+)
+```
+
+## Best Practices
+
+1. **Memory Retrieval**
+   - Always include core memories for personality consistency
+   - Balance between recent and historical context
+   - Use appropriate semantic thresholds for relevance
+
+2. **Context Synthesis**
+   - Prioritize recent interactions for immediate context
+   - Include emotional and factual context
+   - Maintain personality consistency
+
+3. **Performance Optimization**
+   - Use efficient vector similarity search
+   - Implement memory caching for frequent retrievals
+   - Optimize relationship graph queries
+
+## Integration Points
+
+1. **With EllaPrimary**
+   - Provides context for response generation
+   - Maintains personality consistency
+   - Enables natural conversation flow
+
+2. **With EllaEvaluator**
+   - Receives memory evaluations
+   - Updates relationship graphs
+   - Adjusts memory priorities
+
+3. **With Memory System**
+   - Manages memory retrieval
+   - Updates memory relationships
+   - Handles memory prioritization
+
+## Error Handling
+
+1. **Missing Context**
+   - Fallback to core memories
+   - Use default personality traits
+   - Log context retrieval failures
+
+2. **Invalid Memories**
+   - Skip corrupted memory entries
+   - Maintain minimal valid context
+   - Report memory integrity issues
+
+3. **Performance Issues**
+   - Implement timeout mechanisms
+   - Use cached results when necessary
+   - Degrade gracefully under load

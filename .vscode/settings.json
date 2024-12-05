@@ -1,0 +1,9 @@
+{
+    "chat.commandCenter.enabled": false,
+    "inlineChat.experimental.enableZoneToolbar": true,
+    "git.branchProtectionPrompt": "alwaysCommit",
+    "git.confirmNoVerifyCommit": false,
+    "git.confirmForcePush": false,
+    "git.confirmEmptyCommits": false,
+    "git.confirmSync": false
+}

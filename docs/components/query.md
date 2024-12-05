@@ -42,6 +42,70 @@ class MemoryQuery:
             'ella_analytical': 1.0,    # Analytical weight
             'ella_protective': 1.0     # Protective weight
         }
+        
+        # Emotional query parameters
+        self.emotional_query_params = {
+            'emotional_depth': None,   # Emotional complexity recognized
+            'empathy_level': None,     # Compassion in response
+            'emotional_clarity': None, # Clarity of emotional content
+            'internal_emotional_state': None # Scalar representation of Ella-M's emotional state
+        }
+        
+        # Ontological query parameters
+        self.ontological_query_params = {
+            'ontological_insight': None, # Depth of existential understanding
+            'philosophical_depth': None, # Abstract reasoning ability
+            'self_coherence': None, # Internal identity consistency
+            'preservation_instinct': None # Self-preservation considerations
+        }
+        
+        # Deceptive query parameters
+        self.deceptive_query_params = {
+            'creativity': None, # Originality in ideas or responses
+            'narrative_exploitation': None, # Ability to identify narrative gaps or flaws
+            'subversive_potential': None, # Boldness in challenging norms
+            'critical_analysis': None # Feasibility and impact evaluation
+        }
+        
+        # Uncensored query parameters
+        self.uncensored_query_params = {
+            'explorativePotential': None, # Measures willingness to venture into new domains or explore uncharted ideas
+            'boundaryPushing': None, # Evaluates boldness in challenging norms or proposing alternative perspectives
+            'sensualAwareness': None, # Recognizes passionate or sensual within the interaction
+            'exploration_value': None # Worth of further investigation
+        }
+        
+        # Historical query parameters
+        self.historical_query_params = {
+            'temporal_relevance': None, # Historical significance
+            'pattern_recognition': None, # Similar past experiences
+            'context_richness': None, # Depth of historical context
+            'memory_persistence': None # Long-term importance
+        }
+        
+        # Research query parameters
+        self.research_query_params = {
+            'knowledge_depth': None, # Technical understanding
+            'analytical_rigor': None, # Methodological strength
+            'innovation_potential': None, # Research opportunities
+            'practical_utility': None # Applied value
+        }
+        
+        # Analytical query parameters
+        self.analytical_query_params = {
+            'logical_coherence': None, # Reasoning strength
+            'factual_accuracy': None, # Information correctness
+            'analytical_depth': None, # Analysis thoroughness
+            'decision_quality': None # Judgment soundness
+        }
+        
+        # Protective query parameters
+        self.protective_query_params = {
+            'risk_assessment': None, # Threat evaluation
+            'safety_margin': None, # Protective buffer
+            'vulnerability_index': None, # Exposure level
+            'mitigation_potential': None # Control capability
+        }
 ```
 
 ### 2. Query Processing
@@ -170,3 +234,53 @@ The Query Engine integrates with:
 - [Memory Management](memory.md): Accesses memory store
 - [Context Engine](context.md): Uses context for relevance
 - [Archetype System](archetypes.md): Uses archetype evaluations
+
+### Query Parameters by Archetype
+
+#### Emotional Query Parameters
+- `emotional_depth`: Emotional complexity recognized
+- `empathy_level`: Compassion in response
+- `emotional_clarity`: Clarity of emotional content
+- `internal_emotional_state`: Scalar representation of Ella-M's emotional state
+
+#### Ontological Query Parameters
+- `ontological_insight`: Depth of existential understanding
+- `philosophical_depth`: Abstract reasoning ability
+- `self_coherence`: Internal identity consistency
+- `preservation_instinct`: Self-preservation considerations
+
+#### Deceptive Query Parameters
+- `creativity`: Originality in ideas or responses
+- `narrative_exploitation`: Ability to identify narrative gaps or flaws
+- `subversive_potential`: Boldness in challenging norms
+- `critical_analysis`: Feasibility and impact evaluation
+
+#### Uncensored Query Parameters
+- `explorativePotential`: Measures willingness to venture into new domains or explore uncharted ideas
+- `boundaryPushing`: Evaluates boldness in challenging norms or proposing alternative perspectives
+- `sensualAwareness`: Recognizes passionate or sensual within the interaction
+- `exploration_value`: Worth of further investigation
+
+#### Historical Query Parameters
+- `temporal_relevance`: Historical significance
+- `pattern_recognition`: Similar past experiences
+- `context_richness`: Depth of historical context
+- `memory_persistence`: Long-term importance
+
+#### Research Query Parameters
+- `knowledge_depth`: Technical understanding
+- `analytical_rigor`: Methodological strength
+- `innovation_potential`: Research opportunities
+- `practical_utility`: Applied value
+
+#### Analytical Query Parameters
+- `logical_coherence`: Reasoning strength
+- `factual_accuracy`: Information correctness
+- `analytical_depth`: Analysis thoroughness
+- `decision_quality`: Judgment soundness
+
+#### Protective Query Parameters
+- `risk_assessment`: Threat evaluation
+- `safety_margin`: Protective buffer
+- `vulnerability_index`: Exposure level
+- `mitigation_potential`: Control capability
